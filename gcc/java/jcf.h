@@ -36,9 +36,6 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 #define ALLOC xmalloc
 #define REALLOC xrealloc
-#ifndef FREE
-#define FREE(PTR) free(PTR)
-#endif
 
 #ifdef JCF_word
 #define JCF_word JCF_u4
@@ -110,7 +107,7 @@ typedef struct GTY(()) JCF {
   unsigned int right_zip : 1;
   unsigned int finished : 1;
   jcf_filbuf_t filbuf;
-  PTR GTY ((skip)) read_state;
+  void * GTY ((skip)) read_state;
   const char *filename;
   const char *classname;
   /* Directory entry where it was found.  */

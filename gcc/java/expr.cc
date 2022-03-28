@@ -1299,8 +1299,8 @@ expand_java_return (tree type)
 	 The whole if expression just goes away if INT_TYPE_SIZE < 32
 	 is false. */
       if (INT_TYPE_SIZE < 32
-	  && (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res)))
-	      < GET_MODE_SIZE (TYPE_MODE (type))))
+	  && known_lt (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res))),
+	               GET_MODE_SIZE (TYPE_MODE (type))))
 	retval = build1 (NOP_EXPR, TREE_TYPE (res), retval);
       
       TREE_SIDE_EFFECTS (retval) = 1;
@@ -1887,8 +1887,8 @@ expand_java_switch (tree selector, int default_pc)
   tree switch_expr, x;
 
   flush_quick_stack ();
-  switch_expr = build3 (SWITCH_EXPR, TREE_TYPE (selector), selector,
-			NULL_TREE, NULL_TREE);
+  switch_expr = build2 (SWITCH_EXPR, TREE_TYPE (selector), selector,
+			NULL_TREE);
   java_add_stmt (switch_expr);
 
   x = build_case_label (NULL_TREE, NULL_TREE,
@@ -1956,7 +1956,7 @@ pop_arguments (tree method_type)
   return args;
 }
 
-/* Attach to PTR (a block) the declaration found in ENTRY. */
+/* Attach to void * (a block) the declaration found in ENTRY. */
 
 int
 attach_init_test_initialization_flags (treetreehash_entry **slot, tree block)

@@ -499,7 +499,7 @@ handle_constant (JCF *jcf, int index, enum cpool_tag purpose)
     return 0;
 
   if (! CPOOL_INDEX_IN_RANGE (&jcf->cpool, index))
-    error ("<constant pool index %d not in range>", index);
+    error ("constant pool index %d not in range", index);
   
   kind = JPOOL_TAG (jcf, index);
 
@@ -509,7 +509,7 @@ handle_constant (JCF *jcf, int index, enum cpool_tag purpose)
 	  && kind == CONSTANT_Utf8)
 	;
       else
-	error ("<constant pool index %d unexpected type", index);
+	error ("constant pool index %d unexpected type", index);
     }
 
   switch (kind)
@@ -1003,7 +1003,7 @@ handle_signature_attribute (int member_index, JCF *jcf,
 			      attribute_length, attr_type);	\
 }
 
-#include "jcf-reader.c"
+#include "jcf-reader.cc"
 
 tree
 parse_signature (JCF *jcf, int sig_index)
@@ -1228,7 +1228,7 @@ get_class_constant (JCF *jcf, int i)
       if (name[0] == '[')  /* Handle array "classes". */
 	  type = TREE_TYPE (parse_signature_string ((const unsigned char *) name, nlength));
       else
-        { 
+        {
           tree cname = unmangle_classname (name, nlength);
           type = lookup_class (cname);
 	}
@@ -1420,13 +1420,13 @@ jcf_parse (JCF* jcf)
   bitmap_clear (field_offsets);
 
   if (jcf_parse_preamble (jcf) != 0)
-    fatal_error (input_location, "not a valid Java .class file");
+    fatal_error (input_location, "not a valid Java %<.class%> file");
   code = jcf_parse_constant_pool (jcf);
   if (code != 0)
     fatal_error (input_location, "error while parsing constant pool");
   code = verify_constant_pool (jcf);
   if (code > 0)
-    fatal_error (input_location, "error in constant pool entry #%d\n", code);
+    fatal_error (input_location, "error in constant pool entry %d", code);
 
   jcf_parse_class (jcf);
   if (main_class == NULL_TREE)
@@ -1581,13 +1581,13 @@ parse_class_file (void)
 	    continue;
 	  /* We need to compute the DECL_MAX_LOCALS. We need to take
              the wide types into account too. */
-	  for (arg = TYPE_ARG_TYPES (TREE_TYPE (method)), decl_max_locals = 0; 
+	  for (arg = TYPE_ARG_TYPES (TREE_TYPE (method)), decl_max_locals = 0;
 	       arg != end_params_node;
 	       arg = TREE_CHAIN (arg), decl_max_locals += 1)
-	    {
-	      if (TREE_VALUE (arg) && TYPE_IS_WIDE (TREE_VALUE (arg)))
+	  {
+	    if (TREE_VALUE (arg) && TYPE_IS_WIDE (TREE_VALUE (arg)))
 		decl_max_locals += 1;
-	    }
+	  }
 	  DECL_MAX_LOCALS (method) = decl_max_locals;
 	  start_java_method (method);
 	  give_name_to_locals (jcf);
@@ -1749,7 +1749,7 @@ java_parse_file (void)
       finput = fopen (main_input_filename, "r");
       if (finput == NULL)
 	fatal_error (input_location,
-		     "can%'t open %s: %m", LOCATION_FILE (input_location));
+		     "cannot open %s: %m", LOCATION_FILE (input_location));
       list = XNEWVEC (char, avail);
       next = list;
       for (;;)
@@ -1884,11 +1884,11 @@ java_parse_file (void)
       /* Close previous descriptor, if any */
       if (finput && fclose (finput))
 	fatal_error (input_location,
-		     "can%'t close input file %s: %m", main_input_filename);
+		     "cannot close input file %s: %m", main_input_filename);
       
       finput = fopen (filename, "rb");
       if (finput == NULL)
-	fatal_error (input_location, "can%'t open %s: %m", filename);
+	fatal_error (input_location, "cannot open %s: %m", filename);
 
 #ifdef IO_BUFFER_SIZE
       setvbuf (finput, xmalloc (IO_BUFFER_SIZE),
@@ -2060,7 +2060,7 @@ parse_zip_file_entries (void)
 	    char *class_name = compute_class_name (zdir);
 	    int previous_alias_set = -1;
 	    klass = lookup_class (get_identifier (class_name));
-	    FREE (class_name);
+	    free (class_name);
 	    current_jcf = TYPE_JCF (klass);
 	    output_class = current_class = klass;
 

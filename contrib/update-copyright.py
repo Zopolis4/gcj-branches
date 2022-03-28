@@ -617,6 +617,28 @@ class LibGCCFilter (GenericFilter):
                 'soft-fp',
                 ])
 
+class LibJavaFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_dirs |= set ([
+                # Handled separately.
+                'testsuite',
+
+                # Not really part of the library
+                'contrib',
+
+                # Imported from upstream
+                'classpath',
+                ])
+
+    def get_line_filter (self, dir, filename):
+        if filename == 'NameDecoder.h':
+            return re.compile ('.*NAME_COPYRIGHT')
+        if filename == 'ICC_Profile.h':
+            return re.compile ('.*icSigCopyrightTag')
+        return GenericFilter.get_line_filter (self, dir, filename)
+
 class LibPhobosFilter (GenericFilter):
     def __init__ (self):
         GenericFilter.__init__ (self)
@@ -716,7 +738,7 @@ class GCCCmdLine (CmdLine):
         CmdLine.__init__ (self, GCCCopyright)
 
         self.add_dir ('.', TopLevelFilter())
-        # boehm-gc is imported from upstream.
+        self.add_dir ('c++tools')
         self.add_dir ('config', ConfigFilter())
         # contrib isn't really part of GCC.
         self.add_dir ('fixincludes')
