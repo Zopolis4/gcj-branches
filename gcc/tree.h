@@ -2116,7 +2116,6 @@ extern machine_mode element_mode (const_tree t);
   (NUMERICAL_TYPE_CHECK (NODE)->type_non_common.minval)
 #define TYPE_MAX_VALUE(NODE) \
   (NUMERICAL_TYPE_CHECK (NODE)->type_non_common.maxval)
-
 /* If non-NULL, this is an upper bound of the size (in bytes) of an
    object of the given ARRAY_TYPE_NON_COMMON.  This allows temporaries to be
    allocated.  */
