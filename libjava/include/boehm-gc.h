@@ -41,8 +41,7 @@ extern "C" void * GC_local_malloc_atomic(size_t);
 inline void *
 _Jv_AllocObj (jsize size, jclass klass)
 {
-  // This should call GC_GCJ_MALLOC, but that would involve
-  // including gc.h.
+  // FIXME: This should call GC_GCJ_MALLOC
 #ifdef THREAD_LOCAL_ALLOC
   return GC_local_gcj_malloc (size, klass->vtable);
 #else 

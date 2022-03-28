@@ -1299,8 +1299,8 @@ expand_java_return (tree type)
 	 The whole if expression just goes away if INT_TYPE_SIZE < 32
 	 is false. */
       if (INT_TYPE_SIZE < 32
-	  && (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res)))
-	      < GET_MODE_SIZE (TYPE_MODE (type))))
+	  && known_lt (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res))),
+	               GET_MODE_SIZE (TYPE_MODE (type))))
 	retval = build1 (NOP_EXPR, TREE_TYPE (res), retval);
       
       TREE_SIDE_EFFECTS (retval) = 1;
@@ -1412,7 +1412,7 @@ build_instanceof (tree value, tree type)
     {
       load_class (type, 1);
       safe_layout_class (type);
-      if (! TYPE_SIZE (type) || TREE_CODE (TYPE_SIZE (type)) == ERROR_MARK)
+      if (! TYPE_SIZE (type) || error_operand_p(type))
 	return error_mark_node;
     }
   klass = TYPE_NAME (type);
@@ -1887,8 +1887,8 @@ expand_java_switch (tree selector, int default_pc)
   tree switch_expr, x;
 
   flush_quick_stack ();
-  switch_expr = build3 (SWITCH_EXPR, TREE_TYPE (selector), selector,
-			NULL_TREE, NULL_TREE);
+  switch_expr = build2 (SWITCH_EXPR, TREE_TYPE (selector), selector,
+			NULL_TREE);
   java_add_stmt (switch_expr);
 
   x = build_case_label (NULL_TREE, NULL_TREE,
@@ -1956,7 +1956,7 @@ pop_arguments (tree method_type)
   return args;
 }
 
-/* Attach to PTR (a block) the declaration found in ENTRY. */
+/* Attach to void * (a block) the declaration found in ENTRY. */
 
 int
 attach_init_test_initialization_flags (treetreehash_entry **slot, tree block)
@@ -2451,7 +2451,7 @@ expand_invoke (int opcode, int method_ref_index, int nargs ATTRIBUTE_UNUSED)
     {
       load_class (self_type, 1);
       safe_layout_class (self_type);
-      if (TREE_CODE (TYPE_SIZE (self_type)) == ERROR_MARK)
+      if (error_operand_p(self_type))
 	fatal_error (input_location, "failed to find class '%s'", self_name);
     }
   layout_class_methods (self_type);
@@ -2483,10 +2483,10 @@ expand_invoke (int opcode, int method_ref_index, int nargs ATTRIBUTE_UNUSED)
   /* We've found a non-interface method but we are making an
      interface call.  This can happen if the interface overrides a
      method in Object.  */
-  if (! flag_verify_invocations
+  if (!flag_verify_invocations
       && opcode == OPCODE_invokeinterface
       && method
-      && ! CLASS_INTERFACE (TYPE_NAME (DECL_CONTEXT (method))))
+      && !CLASS_INTERFACE (TYPE_NAME (DECL_CONTEXT (method))))
     method = NULL_TREE;
 
   if (method == NULL_TREE)

@@ -629,7 +629,6 @@ class LibJavaFilter (GenericFilter):
 
                 # Imported from upstream
                 'classpath',
-                'libltdl',
                 ])
 
     def get_line_filter (self, dir, filename):
@@ -737,7 +736,11 @@ class GCCCmdLine (CmdLine):
         CmdLine.__init__ (self, GCCCopyright)
 
         self.add_dir ('.', TopLevelFilter())
+<<<<<<< HEAD
         # boehm-gc is imported from upstream.
+=======
+        self.add_dir ('c++tools')
+>>>>>>> 518e63fcd4b (Modernise Java front-end and library.)
         self.add_dir ('config', ConfigFilter())
         # contrib isn't really part of GCC.
         self.add_dir ('fixincludes')
