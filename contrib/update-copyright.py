@@ -616,6 +616,53 @@ class LibGCCFilter (GenericFilter):
                 'soft-fp',
                 ])
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+class LibJavaFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_dirs |= set ([
+                # Handled separately.
+                'testsuite',
+
+                # Not really part of the library
+                'contrib',
+
+                # Imported from upstream
+                'classpath',
+                ])
+
+    def get_line_filter (self, dir, filename):
+        if filename == 'NameDecoder.h':
+            return re.compile ('.*NAME_COPYRIGHT')
+        if filename == 'ICC_Profile.h':
+            return re.compile ('.*icSigCopyrightTag')
+        return GenericFilter.get_line_filter (self, dir, filename)
+
+class LibPhobosFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_files |= set ([
+                # Source module imported from upstream.
+                'object.d',
+                ])
+
+        self.skip_dirs |= set ([
+                # Contains sources imported from upstream.
+                'core',
+                'etc',
+                'gc',
+                'gcstub',
+                'rt',
+                'std',
+                ])
+
+>>>>>>> 8390bfd95d9 (Add Java entries to scripts in config/)
+>>>>>>> 08d9f60b910 (Modernise Java front-end and library (uhaiusyidhkjfiuasyjgdhfiaugydsfh).)
 class LibStdCxxFilter (GenericFilter):
     def __init__ (self):
         GenericFilter.__init__ (self)
@@ -694,7 +741,11 @@ class GCCCmdLine (CmdLine):
         CmdLine.__init__ (self, GCCCopyright)
 
         self.add_dir ('.', TopLevelFilter())
+<<<<<<< HEAD
         # boehm-gc is imported from upstream.
+=======
+        self.add_dir ('c++tools')
+>>>>>>> 518e63fcd4b (Modernise Java front-end and library.)
         self.add_dir ('config', ConfigFilter())
         # contrib isn't really part of GCC.
         self.add_dir ('fixincludes')

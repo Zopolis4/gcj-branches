@@ -23,6 +23,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 /* Hacked by Per Bothner <bothner@cygnus.com> February 1996. */
 
+
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -36,6 +37,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "tree-dump.h"
 #include "opts.h"
 #include "context.h"
+#include "cpplib.h"
 
 static bool java_init (void);
 static void java_finish (void);
@@ -44,7 +46,7 @@ static void java_init_options_struct (struct gcc_options *);
 static void java_init_options (unsigned int, struct cl_decoded_option *);
 static bool java_post_options (const char **);
 
-static bool java_handle_option (size_t, const char *, int, int, location_t,
+static bool java_handle_option (size_t, const char *, HOST_WIDE_INT, int, location_t,
 				const struct cl_option_handlers *);
 static void put_decl_string (const char *, int);
 static void put_decl_node (tree, int);
@@ -170,7 +172,7 @@ struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
  * return false, but do not complain if the option is not recognized.
  */
 static bool
-java_handle_option (size_t scode, const char *arg, int value,
+java_handle_option (size_t scode, const char *arg, HOST_WIDE_INT value,
 		    int kind ATTRIBUTE_UNUSED, location_t loc ATTRIBUTE_UNUSED,
 		    const struct cl_option_handlers *handlers ATTRIBUTE_UNUSED)
 {
@@ -261,8 +263,9 @@ java_handle_option (size_t scode, const char *arg, int value,
       break;
 
     case OPT_fdump_:
-      if (!g->get_dumps ()->dump_switch_p (arg))
-	return false;
+      /* FIXME: This is no longer a bool value */
+      /* if (!g->get_dumps ()->dump_switch_p (arg))
+	return false; */
       break;
 
     case OPT_fencoding_:
@@ -569,9 +572,9 @@ java_post_options (const char **pfilename)
 
   /* Excess precision other than "fast" requires front-end
      support.  */
-  if (flag_excess_precision_cmdline == EXCESS_PRECISION_STANDARD)
-    sorry ("-fexcess-precision=standard for Java");
-  flag_excess_precision_cmdline = EXCESS_PRECISION_FAST;
+  if (flag_excess_precision == EXCESS_PRECISION_STANDARD)
+    sorry ("%<-fexcess-precision=standard%> for Java");
+  flag_excess_precision = EXCESS_PRECISION_FAST;
 
   /* An absolute requirement: if we're not using indirect dispatch, we
      must always verify everything.  */
@@ -581,10 +584,10 @@ java_post_options (const char **pfilename)
   if (flag_reduced_reflection)
     {
       if (flag_indirect_dispatch)
-        error ("-findirect-dispatch is incompatible "
-               "with -freduced-reflection");
+        error ("%<-findirect-dispatch%> is incompatible "
+               "with %<-freduced-reflection%>");
       if (flag_jni)
-        error ("-fjni is incompatible with -freduced-reflection");
+        error ("%<-fjni%> is incompatible with %<-freduced-reflection%>");
     }
 
   /* Open input file.  */
@@ -595,7 +598,7 @@ java_post_options (const char **pfilename)
       filename = "stdin";
 
       if (dependency_tracking)
-	error ("can%'t do dependency tracking with input from stdin");
+	error ("cannot do dependency tracking with input from stdin");
     }
   else
     {

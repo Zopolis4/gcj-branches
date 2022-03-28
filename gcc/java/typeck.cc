@@ -347,8 +347,8 @@ promote_type (tree type)
     }
 }
 
-/* Parse a signature string, starting at *PTR and ending at LIMIT.
-   Return the seen TREE_TYPE, updating *PTR. */
+/* Parse a signature string, starting at *ptr and ending at LIMIT.
+   Return the seen TREE_TYPE, updating *ptr. */
 
 static tree
 parse_signature_type (const unsigned char **ptr, const unsigned char *limit)
@@ -492,6 +492,7 @@ build_java_signature (tree type)
     type = TREE_TYPE (type);
   MAYBE_CREATE_TYPE_TYPE_LANG_SPECIFIC (type);
   sig = TYPE_SIGNATURE (type);
+
   if (sig == NULL_TREE)
     {
       char sg[2];
@@ -533,6 +534,14 @@ build_java_signature (tree type)
 	    }
 	  else
 	    {
+              // tree bob;
+              // bob = TYPE_NAME (type);
+              // tree bob2;
+              // if (DECL_NAME (bob))
+              // bob2 = DECL_NAME (bob);
+              // // mk so it breaks on the DECL_NAME call
+              // // whyyyyyy
+              // if (DECL_NAME (TYPE_NAME (type)))
 	      t = DECL_NAME (TYPE_NAME (type));
 	      sig = ident_subst (IDENTIFIER_POINTER (t), IDENTIFIER_LENGTH (t),
 				 "L", '.', '/', ";");
@@ -542,18 +551,18 @@ build_java_signature (tree type)
 	case FUNCTION_TYPE:
 	  {
 	    extern struct obstack temporary_obstack;
-	    sig = build_java_argument_signature (type);
-	    obstack_1grow (&temporary_obstack, '(');
-	    obstack_grow (&temporary_obstack,
-			  IDENTIFIER_POINTER (sig), IDENTIFIER_LENGTH (sig));
-	    obstack_1grow (&temporary_obstack, ')');
+            sig = build_java_argument_signature (type);
+            obstack_1grow (&temporary_obstack, '(');
+            obstack_grow (&temporary_obstack,
+                           IDENTIFIER_POINTER (sig), IDENTIFIER_LENGTH (sig));
+            obstack_1grow (&temporary_obstack, ')');
 
-	    t = build_java_signature (TREE_TYPE (type));
-	    obstack_grow0 (&temporary_obstack,
+            t = build_java_signature (TREE_TYPE (type));
+            obstack_grow0 (&temporary_obstack,
 			   IDENTIFIER_POINTER (t), IDENTIFIER_LENGTH (t));
 
-	    sig = get_identifier ((char *) obstack_base (&temporary_obstack));
-	    obstack_free (&temporary_obstack,
+            sig = get_identifier ((char *) obstack_base (&temporary_obstack));
+            obstack_free (&temporary_obstack,
 			  obstack_base (&temporary_obstack));
 	  }
 	  break;
@@ -624,7 +633,7 @@ lookup_java_method (tree searched_class, tree method_name,
 		    method_signature, build_java_signature);
 }
 
-/* Return true iff KLASS (or its ancestors) has a method METHOD_NAME.  */
+/* Return true iff KLASS (or its ancestors) has a method METHOD_NAME. Â */
 int
 has_method (tree klass, tree method_name)
 {
@@ -637,22 +646,25 @@ has_method (tree klass, tree method_name)
    method matching METHOD_NAME and signature SIGNATURE.  A private
    helper for lookup_do.  */
 static tree
-shallow_find_method (tree searched_class, int flags, tree method_name, 
+shallow_find_method (tree searched_class, int flags, tree method_name,
 	     tree signature, tree (*signature_builder) (tree))
 {
   tree method;
   for (method = TYPE_METHODS (searched_class);
-       method != NULL_TREE;  method = DECL_CHAIN (method))
+       method != NULL_TREE && TREE_CODE (method) != TREE_BINFO; method = DECL_CHAIN (method))
     {
-      tree method_sig = (*signature_builder) (TREE_TYPE (method));
-      if (DECL_NAME (method) == method_name && method_sig == signature)
-	{
-	  /* If the caller requires a visible method, then we
-	     skip invisible methods here.  */
-	  if (! (flags & SEARCH_VISIBLE)
-	      || ! METHOD_INVISIBLE (method))
-	    return method;
-	}
+      if (TREE_TYPE (method) != NULL_TREE)
+      {
+        tree method_sig = (*signature_builder) (TREE_TYPE (method));
+        if (DECL_NAME (method) == method_name && method_sig == signature)
+          {
+            /* If the caller requires a visible method, then we
+               skip invisible methods here.  */
+            if (! (flags & SEARCH_VISIBLE)
+                || ! METHOD_INVISIBLE (method))
+              return method;
+        }
+      }
     }
   return NULL_TREE;
 }
@@ -661,7 +673,7 @@ shallow_find_method (tree searched_class, int flags, tree method_name,
    METHOD_NAME and signature SIGNATURE.  A private helper for
    lookup_do.  */
 static tree
-find_method_in_superclasses (tree searched_class, int flags, 
+find_method_in_superclasses (tree searched_class, int flags,
                              tree method_name, tree signature,
                              tree (*signature_builder) (tree))
 {
@@ -690,7 +702,7 @@ find_method_in_interfaces (tree searched_class, int flags, tree method_name,
   tree binfo, base_binfo;
 
   for (binfo = TYPE_BINFO (searched_class), i = 1;
-       BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
+       TREE_CODE (binfo) == TREE_BINFO && BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     {
       tree iclass = BINFO_TYPE (base_binfo);
       tree method;
@@ -756,9 +768,11 @@ lookup_do (tree searched_class, int flags, tree method_name,
     return method;
 
   /* Then look in our superclasses.  */
-  if (! CLASS_INTERFACE (TYPE_NAME (searched_class)))
-    method = find_method_in_superclasses (searched_class, flags, method_name,
-					  signature, signature_builder);  
+  if (method != NULL_TREE)
+    if (TREE_CODE (method) != TREE_BINFO)
+      if (! CLASS_INTERFACE (TYPE_NAME (searched_class)))
+        method = find_method_in_superclasses (searched_class, flags, method_name,
+		  			        signature, signature_builder);  
   if (method)
     return method;
   
@@ -777,11 +791,14 @@ tree
 lookup_java_constructor (tree clas, tree method_signature)
 {
   tree method = TYPE_METHODS (clas);
-  for ( ; method != NULL_TREE;  method = DECL_CHAIN (method))
+  for ( ; method != NULL_TREE && TREE_CODE (method) != TREE_BINFO; method = DECL_CHAIN (method))
     {
-      tree method_sig = build_java_signature (TREE_TYPE (method));
-      if (DECL_CONSTRUCTOR_P (method) && method_sig == method_signature)
-	return method;
+      if (TREE_TYPE (method) != NULL_TREE)
+      {
+        tree method_sig = build_java_signature (TREE_TYPE (method));
+        if (DECL_CONSTRUCTOR_P (method) && method_sig == method_signature)
+          return method;
+      }
     }
   return NULL_TREE;
 }

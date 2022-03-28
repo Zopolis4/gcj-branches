@@ -2419,6 +2419,7 @@ void
 layout_class (tree this_class)
 {
   int i;
+
   tree super_class = CLASSTYPE_SUPER (this_class);
 
   class_list = tree_cons (this_class, NULL_TREE, class_list);

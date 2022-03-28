@@ -31,10 +31,10 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 #include "jcf.h"
 
-
+
 
 /* The dependency structure used for this invocation.  */
-struct deps *dependencies;
+struct mkdeps *dependencies;
 
 /* The output file, or NULL if we aren't doing dependency tracking.  */
 static FILE *dep_out = NULL;
@@ -44,8 +44,6 @@ static int system_files;
 
 /* Nonzero if we are dumping out dummy dependencies.  */
 static int print_dummies;
-
-
 
 /* Call this to reset the dependency module.  This is required if
    multiple dependency files are being generated from a single tool
@@ -133,8 +131,11 @@ jcf_dependency_write (void)
 
   gcc_assert (dependencies);
 
-  deps_write (dependencies, dep_out, 72);
   if (print_dummies)
-    deps_phony_targets (dependencies, dep_out);
+    deps_write (dependencies, dep_out, 1, 72);
+  else
+    deps_write (dependencies, dep_out, 0, 72);
+
   fflush (dep_out);
 }
+

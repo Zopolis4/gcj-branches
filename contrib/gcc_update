@@ -126,6 +126,16 @@ libquadmath/configure: libquadmath/configure.ac libquadmath/aclocal.m4
 libquadmath/aclocal.m4: libquadmath/configure.ac libquadmath/acinclude.m4
 libquadmath/Makefile.in: libquadmath/Makefile.am libquadmath/configure.ac libgfortran/aclocal.m4
 libgfortran/configure: libgfortran/configure.ac libgfortran/aclocal.m4
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+libjava/aclocal.m4: libjava/configure.ac
+libjava/Makefile.in: libjava/Makefile.am libjava/configure.ac libjava/aclocal.m4
+libjava/configure: libjava/configure.ac libjava/aclocal.m4
+libcody/configure: libcody/configure.ac libcody/config.m4
+>>>>>>> 8390bfd95d9 (Add Java entries to scripts in config/)
+>>>>>>> 08d9f60b910 (Modernise Java front-end and library (uhaiusyidhkjfiuasyjgdhfiaugydsfh).)
 libcpp/aclocal.m4: libcpp/configure.ac
 libcpp/Makefile.in: libcpp/configure.ac libcpp/aclocal.m4
 libcpp/configure: libcpp/configure.ac libcpp/aclocal.m4
