@@ -402,7 +402,6 @@ pop_binding (tree id, tree decl)
     binding->value = NULL_TREE;
   else
     {
-      gcc_assert (binding->type == decl);
       binding->type = NULL_TREE;
     }
 
