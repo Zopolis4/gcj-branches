@@ -2629,7 +2629,7 @@ fprintf (fp, "# albss: %s (%lld,%d) ro %d cst %d stat %d com %d"
     }
 
   /* So we have a public symbol (small item fudge for Java, see above).  */
-  if ((DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL) 
+  if ((DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL)
        || (size && size <= 2))
     {
       /* Put smaller objects in data, where the section anchors system can get
