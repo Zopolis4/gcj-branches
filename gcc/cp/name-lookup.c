@@ -6860,6 +6860,9 @@ do_pushtag (tree name, tree type, tag_scope scope)
       if (!context)
 	context = current_namespace;
 
+      if (current_lang_name == lang_name_java)
+        TYPE_FOR_JAVA (type) = 1;
+
       if (b->kind == sk_class
 	  || (b->kind == sk_template_parms
 	      && b->level_chain->kind == sk_class))
