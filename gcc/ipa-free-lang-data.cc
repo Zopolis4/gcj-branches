@@ -451,6 +451,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  /* C++ FE uses TREE_PURPOSE to store initial values.  */
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (TREE_CODE (type) == METHOD_TYPE)
     {
@@ -461,6 +463,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  TREE_VALUE (p) = fld_simplified_type (TREE_VALUE (p), fld);
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {
@@ -798,8 +802,20 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	  tree tem;
 	  FOR_EACH_VEC_ELT (*BINFO_BASE_BINFOS (TYPE_BINFO (t)), i, tem)
 	    fld_worklist_push (TREE_TYPE (tem), fld);
-	  fld_worklist_push (BINFO_TYPE (TYPE_BINFO (t)), fld);
-	  fld_worklist_push (BINFO_VTABLE (TYPE_BINFO (t)), fld);
+	  tem = BINFO_VIRTUALS (TYPE_BINFO (t));
+	  if (tem
+	      /* The Java FE overloads BINFO_VIRTUALS for its own purpose.  */
+	      && TREE_CODE (tem) == TREE_LIST)
+	    do
+	      {
+		fld_worklist_push (TREE_VALUE (tem), fld);
+		tem = TREE_CHAIN (tem);
+	      }
+	    while (tem);
+	    // do we need this?
+	    //https://github.com/Zopolis4/gcj/commit/ed5cd5bc7132cd6d32f0e370d91ee6b380389c82#diff-134d6c9810825252ba5e30d9326d4a10186d8c717ac1a632a769b57420c77f4bR5660
+	    //https://github.com/Zopolis4/gcj/commit/f35c8c9c9df1ae0ce73b39e61d3118534ace05b2#diff-2bd37103083a5b92b4c64edd961bed95ab27dbda302117cd3322fa679b7c637eR814
+	    //https://github.com/gcc-mirror/gcc/commit/c1b8f25d8090e778b330555005c81bc0c582a6b8#diff-134d6c9810825252ba5e30d9326d4a10186d8c717ac1a632a769b57420c77f4b
 	}
       if (RECORD_OR_UNION_TYPE_P (t))
 	{
@@ -814,8 +830,8 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	      tem = TREE_CHAIN (tem);
 	    }
 	}
-      if (FUNC_OR_METHOD_TYPE_P (t))
-	fld_worklist_push (TYPE_METHOD_BASETYPE (t), fld);
+ //      if (FUNC_OR_METHOD_TYPE_P (t))
+	// fld_worklist_push (TYPE_METHOD_BASETYPE (t), fld);
 
       fld_worklist_push (TYPE_STUB_DECL (t), fld);
       *ws = 0;
