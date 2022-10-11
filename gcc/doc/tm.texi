@@ -11727,6 +11727,28 @@ conversion rules.
 This is currently used only by the C and C++ front ends.
 @end deftypefn
 
+<<<<<<< HEAD
+=======
+@deftypefn {Target Hook} bool TARGET_VERIFY_TYPE_CONTEXT (location_t @var{loc}, type_context_kind @var{context}, const_tree @var{type}, bool @var{silent_p})
+If defined, this hook returns false if there is a target-specific reason
+why type @var{type} cannot be used in the source language context described
+by @var{context}.  When @var{silent_p} is false, the hook also reports an
+error against @var{loc} for invalid uses of @var{type}.
+
+Calls to this hook should be made through the global function
+@code{verify_type_context}, which makes the @var{silent_p} parameter
+default to false and also handles @code{error_mark_node}.
+
+The default implementation always returns true.
+@end deftypefn
+
+@defmac TARGET_USE_JCR_SECTION
+This macro determines whether to use the JCR section to register Java
+classes. By default, TARGET_USE_JCR_SECTION is defined to 1 if both
+SUPPORTS_WEAK and TARGET_HAVE_NAMED_SECTIONS are true, else 0.
+@end defmac
+
+>>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
 @defmac OBJC_JBLEN
 This macro determines the size of the objective C jump buffer for the
 NeXT runtime. By default, OBJC_JBLEN is defined to an innocuous value.
