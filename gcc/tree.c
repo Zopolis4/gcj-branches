@@ -5694,7 +5694,6 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 		tem = TREE_CHAIN (tem);
 	      }
 	    while (tem);
-	}
       if (RECORD_OR_UNION_TYPE_P (t))
 	{
 	  tree tem;
@@ -13967,6 +13966,19 @@ verify_type (const_tree t)
 	{
 	  error ("TYPE_METHODS is not FUNCTION_DECL, TEMPLATE_DECL nor error_mark_node");
 	  debug_tree (TYPE_METHODS (t));
+	}
+      /* FIXME: Java builds invalid empty binfos that do not have
+	 TREE_TYPE set.  */
+      else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t) && 0)
+	{
+	  error ("%<TYPE_BINFO%> type is not %<TYPE_MAIN_VARIANT%>");
+	  debug_tree (TREE_TYPE (TYPE_BINFO (t)));
+	  error_found = true;
+	}
+      else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t))
+	{
+	  error ("TYPE_BINFO type is not TYPE_MAIN_VARIANT");
+	  debug_tree (TREE_TYPE (TYPE_BINFO (t)));
 	  error_found = true;
 	}
     }

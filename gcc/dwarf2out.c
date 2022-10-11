@@ -10782,7 +10782,6 @@ output_pubname (dw_offset die_offset, pubname_entry *entry)
         case DW_TAG_enumeration_type:
           GDB_INDEX_SYMBOL_KIND_SET_VALUE(flags, GDB_INDEX_SYMBOL_KIND_TYPE);
           if (!is_cxx () && !is_java ())
-	    GDB_INDEX_SYMBOL_STATIC_SET_VALUE(flags, 1);
           break;
         default:
           /* An unusual tag.  Leave the flag-byte empty.  */
