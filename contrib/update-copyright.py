@@ -614,6 +614,51 @@ class LibGCCFilter (GenericFilter):
                 'soft-fp',
                 ])
 
+<<<<<<< HEAD
+=======
+class LibJavaFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_dirs |= set ([
+                # Handled separately.
+                'testsuite',
+
+                # Not really part of the library
+                'contrib',
+
+                # Imported from upstream
+                'classpath',
+                'libltdl',
+                ])
+
+    def get_line_filter (self, dir, filename):
+        if filename == 'NameDecoder.h':
+            return re.compile ('.*NAME_COPYRIGHT')
+        if filename == 'ICC_Profile.h':
+            return re.compile ('.*icSigCopyrightTag')
+        return GenericFilter.get_line_filter (self, dir, filename)
+
+class LibPhobosFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_files |= set ([
+                # Source module imported from upstream.
+                'object.d',
+                ])
+
+        self.skip_dirs |= set ([
+                # Contains sources imported from upstream.
+                'core',
+                'etc',
+                'gc',
+                'gcstub',
+                'rt',
+                'std',
+                ])
+
+>>>>>>> 8390bfd95d9 (Add Java entries to scripts in config/)
 class LibStdCxxFilter (GenericFilter):
     def __init__ (self):
         GenericFilter.__init__ (self)
@@ -717,6 +762,8 @@ class GCCCmdLine (CmdLine):
         self.add_dir ('libhsail-rt')
         self.add_dir ('libiberty')
         self.add_dir ('libitm')
+        self.add_dir ('libjava', LibJavaFilter())
+        self.add_dir (os.path.join ('libjava', 'testsuite'), TestsuiteFilter())
         self.add_dir ('libobjc')
         # liboffloadmic is imported from upstream.
         self.add_dir ('libquadmath')
