@@ -651,20 +651,17 @@ shallow_find_method (tree searched_class, int flags, tree method_name,
 {
   tree method;
   for (method = TYPE_METHODS (searched_class);
-       method != NULL_TREE && TREE_CODE (method) != TREE_BINFO; method = DECL_CHAIN (method))
+       method != NULL_TREE; method = DECL_CHAIN (method))
     {
-      if (TREE_TYPE (method) != NULL_TREE)
-      {
-        tree method_sig = (*signature_builder) (TREE_TYPE (method));
-        if (DECL_NAME (method) == method_name && method_sig == signature)
-          {
-            /* If the caller requires a visible method, then we
-               skip invisible methods here.  */
-            if (! (flags & SEARCH_VISIBLE)
-                || ! METHOD_INVISIBLE (method))
-              return method;
-        }
-      }
+      tree method_sig = (*signature_builder) (TREE_TYPE (method));
+      if (DECL_NAME (method) == method_name && method_sig == signature)
+	{
+	  /* If the caller requires a visible method, then we
+	     skip invisible methods here.  */
+	  if (! (flags & SEARCH_VISIBLE)
+	    || ! METHOD_INVISIBLE (method))
+	  return method;
+	}
     }
   return NULL_TREE;
 }
@@ -702,7 +699,7 @@ find_method_in_interfaces (tree searched_class, int flags, tree method_name,
   tree binfo, base_binfo;
 
   for (binfo = TYPE_BINFO (searched_class), i = 1;
-       TREE_CODE (binfo) == TREE_BINFO && BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
+       BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     {
       tree iclass = BINFO_TYPE (base_binfo);
       tree method;
@@ -768,11 +765,9 @@ lookup_do (tree searched_class, int flags, tree method_name,
     return method;
 
   /* Then look in our superclasses.  */
-  if (method != NULL_TREE)
-    if (TREE_CODE (method) != TREE_BINFO)
-      if (! CLASS_INTERFACE (TYPE_NAME (searched_class)))
-        method = find_method_in_superclasses (searched_class, flags, method_name,
-		  			        signature, signature_builder);  
+  if (! CLASS_INTERFACE (TYPE_NAME (searched_class)))
+    method = find_method_in_superclasses (searched_class, flags, method_name,
+		  			  signature, signature_builder);
   if (method)
     return method;
   
@@ -791,14 +786,11 @@ tree
 lookup_java_constructor (tree clas, tree method_signature)
 {
   tree method = TYPE_METHODS (clas);
-  for ( ; method != NULL_TREE && TREE_CODE (method) != TREE_BINFO; method = DECL_CHAIN (method))
+  for ( ; method != NULL_TREE; method = DECL_CHAIN (method))
     {
-      if (TREE_TYPE (method) != NULL_TREE)
-      {
-        tree method_sig = build_java_signature (TREE_TYPE (method));
-        if (DECL_CONSTRUCTOR_P (method) && method_sig == method_signature)
-          return method;
-      }
+      tree method_sig = build_java_signature (TREE_TYPE (method));
+      if (DECL_CONSTRUCTOR_P (method) && method_sig == method_signature)
+	return method;
     }
   return NULL_TREE;
 }
