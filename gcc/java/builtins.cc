@@ -349,7 +349,7 @@ compareAndSwapLong_builtin (tree method_return_type ATTRIBUTE_UNUSED,
      versions.  */
   if (can_compare_and_swap_p (mode,
 			      (flag_use_atomic_builtins
-			       && known_le (GET_MODE_SIZE (mode), UNITS_PER_WORD))))
+			       && (GET_MODE_SIZE (mode) <= UNITS_PER_WORD))))
     {
       tree addr, stmt;
       enum built_in_function fncode = BUILT_IN_SYNC_BOOL_COMPARE_AND_SWAP_8;
@@ -473,7 +473,8 @@ define_builtin (enum built_in_function val,
   TREE_PUBLIC (decl) = 1;
   SET_DECL_ASSEMBLER_NAME (decl, get_identifier (libname));
   pushdecl (decl);
-  set_decl_built_in_function (decl, BUILT_IN_NORMAL, val);
+  DECL_BUILT_IN_CLASS (decl) = BUILT_IN_NORMAL;
+  DECL_FUNCTION_CODE (decl) = val;
   set_call_expr_flags (decl, flags);
 
   set_builtin_decl (val, decl, true);

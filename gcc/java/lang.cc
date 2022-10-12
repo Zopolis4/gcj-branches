@@ -46,7 +46,7 @@ static void java_init_options_struct (struct gcc_options *);
 static void java_init_options (unsigned int, struct cl_decoded_option *);
 static bool java_post_options (const char **);
 
-static bool java_handle_option (size_t, const char *, HOST_WIDE_INT, int, location_t,
+static bool java_handle_option (size_t, const char *, int, int, location_t,
 				const struct cl_option_handlers *);
 static void put_decl_string (const char *, int);
 static void put_decl_node (tree, int);
@@ -68,9 +68,9 @@ static tree handle_nonnull_attribute (tree *, tree, tree, int, bool *);
 /* Table of machine-independent attributes.  */
 const struct attribute_spec java_attribute_table[] =
 {
-  { "nonnull",                0, -1, false, true, true, false,
-			      handle_nonnull_attribute, NULL },
-  { NULL,                     0, 0, false, false, false, false, NULL, NULL }
+  { "nonnull",                0, -1, false, true, true,
+			      NULL, false },
+  { NULL,                     0, 0, false, false, false, NULL, false }
 };
 
 /* Used to avoid printing error messages with bogus function
@@ -173,7 +173,7 @@ struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
  * return false, but do not complain if the option is not recognized.
  */
 static bool
-java_handle_option (size_t scode, const char *arg, HOST_WIDE_INT value,
+java_handle_option (size_t scode, const char *arg, int value,
 		    int kind ATTRIBUTE_UNUSED, location_t loc ATTRIBUTE_UNUSED,
 		    const struct cl_option_handlers *handlers ATTRIBUTE_UNUSED)
 {
@@ -573,9 +573,9 @@ java_post_options (const char **pfilename)
 
   /* Excess precision other than "fast" requires front-end
      support.  */
-  if (flag_excess_precision == EXCESS_PRECISION_STANDARD)
+  if (flag_excess_precision_cmdline == EXCESS_PRECISION_STANDARD)
     sorry ("%<-fexcess-precision=standard%> for Java");
-  flag_excess_precision = EXCESS_PRECISION_FAST;
+  flag_excess_precision_cmdline = EXCESS_PRECISION_FAST;
 
   /* An absolute requirement: if we're not using indirect dispatch, we
      must always verify everything.  */
