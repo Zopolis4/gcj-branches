@@ -335,20 +335,14 @@ and up works.
 Necessary when regenerating @file{Makefile} dependencies in libiberty.
 Necessary when regenerating @file{libiberty/functions.texi}.
 Necessary when generating manpages from Texinfo manuals.
-<<<<<<< HEAD
 Used by various scripts to generate some files included in SVN (mainly
 Unicode-related and rarely changing) from source tables.
-=======
-Used by various scripts to generate some files included in the source
-repository (mainly Unicode-related and rarely changing) from source
-tables.
 
 @item @command{jar}, or InfoZIP (@command{zip} and @command{unzip})
 
 Necessary to build libgcj, the GCJ runtime.
 
 Used by @command{automake}.
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
 
 @end table
 
@@ -949,11 +943,7 @@ only for the listed packages.  For other packages, only static libraries
 will be built.  Package names currently recognized in the GCC tree are
 @samp{libgcc} (also known as @samp{gcc}), @samp{libstdc++} (not
 @samp{libstdc++-v3}), @samp{libffi}, @samp{zlib}, @samp{boehm-gc},
-<<<<<<< HEAD
-@samp{ada}, @samp{libada}, @samp{libgo}, and @samp{libobjc}.
-=======
-@samp{ada}, @samp{libada}, @samp{libjava}, @samp{libgo}, @samp{libobjc}, and @samp{libphobos}.
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
+@samp{ada}, @samp{libada}, @samp{libjava}, @samp{libgo}, and @samp{libobjc}.
 Note @samp{libiberty} does not support shared libraries at all.
 
 Use @option{--disable-shared} to build only static libraries.  Note that
@@ -1659,13 +1649,9 @@ their runtime libraries should be built.  For a list of valid values for
 grep ^language= */config-lang.in
 @end smallexample
 Currently, you can use any of the following:
-<<<<<<< HEAD
 @code{all}, @code{ada}, @code{c}, @code{c++}, @code{fortran},
-@code{go}, @code{jit}, @code{lto}, @code{objc}, @code{obj-c++}.
-=======
-@code{all}, @code{default}, @code{ada}, @code{c}, @code{c++}, @code{d},
-@code{fortran}, @code{go}, @code{java}, @code{jit}, @code{lto}, @code{objc}, @code{obj-c++}.
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
+@code{go}, @code{java}, @code{jit}, @code{lto}, @code{objc}, @code{obj-c++}.
+
 Building the Ada compiler has special requirements, see below.
 If you do not pass this flag, or specify the option @code{all}, then all
 default languages available in the @file{gcc} sub-tree will be configured.
@@ -2991,15 +2977,9 @@ on a simulator as described at @uref{http://gcc.gnu.org/simtest-howto.html}.
 
 In order to run sets of tests selectively, there are targets
 @samp{make check-gcc} and language specific @samp{make check-c},
-<<<<<<< HEAD
 @samp{make check-c++}, @samp{make check-fortran},
 @samp{make check-ada}, @samp{make check-objc}, @samp{make check-obj-c++},
-@samp{make check-lto}
-=======
-@samp{make check-c++}, @samp{make check-d} @samp{make check-fortran},
-@samp{make check-java}, @samp{make check-ada}, @samp{make check-objc},
-@samp{make check-obj-c++}, @samp{make check-lto}
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
+@samp{make check-lto}, @samp{make check-java}
 in the @file{gcc} subdirectory of the object directory.  You can also
 just run @samp{make check} in a subdirectory of the object directory.
 
@@ -4685,13 +4665,8 @@ you can install a pre-built GCC to bootstrap and install GCC.  See the
 @uref{binaries.html,,binaries page} for details.
 
 The Solaris 2 @command{/bin/sh} will often fail to configure
-<<<<<<< HEAD
-@samp{libstdc++-v3}or @samp{boehm-gc}.  We therefore recommend using the
+@samp{libstdc++-v3}, @samp{boehm-gc} or @samp{libjava}.  We therefore recommend using the
 following initial sequence of commands
-=======
-@samp{libstdc++-v3}, @samp{boehm-gc} or @samp{libjava}.  We therefore
-recommend using the following initial sequence of commands
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
 
 @smallexample
 % CONFIG_SHELL=/bin/ksh
@@ -4755,39 +4730,12 @@ GNU binutils.  @samp{libstdc++} symbol versioning will be disabled if no
 appropriate version is found.  Solaris @command{c++filt} from the Solaris
 Studio compilers does @emph{not} work.
 
-<<<<<<< HEAD
 Sun bug 4927647 sometimes causes random spurious testsuite failures
 related to missing diagnostic output.  This bug doesn't affect GCC
 itself, rather it is a kernel bug triggered by the @command{expect}
 program which is used only by the GCC testsuite driver.  When the bug
 causes the @command{expect} program to miss anticipated output, extra
 testsuite failures appear.
-=======
-In order to build the GNU D compiler, GDC, a working @samp{libphobos} is
-needed.  That library wasn't built by default in GCC 9--11 on SPARC, or
-on x86 when the Solaris assembler is used, but can be enabled by
-configuring with @option{--enable-libphobos}.  Also, GDC 9.4.0 is
-required on x86, while GDC 9.3.0 is known to work on SPARC.
-
-GNU @command{make} version 3.81 or later is required to build libjava
-with the Solaris linker.
-
-The versions of the GNU Multiple Precision Library (GMP), the MPFR
-library and the MPC library bundled with Solaris 11.3 and later are
-usually recent enough to match GCC's requirements.  There are two
-caveats:
-
-@itemize @bullet
-@item
-While the version of the GMP library in Solaris 11.3 works with GCC, you
-need to configure with @option{--with-gmp-include=/usr/include/gmp}.
-
-@item
-The version of the MPFR libary included in Solaris 11.3 is too old; you
-need to provide a more recent one.
-
-@end itemize
->>>>>>> 7c0541a4b72 (Re-add documentation for Java front-end and library.)
 
 @html
 <hr />
