@@ -4,7 +4,9 @@ AC_PREREQ(2.64)
 AC_INIT
 AC_CONFIG_SRCDIR([zlib.h])
 
-AM_ENABLE_MULTILIB(, ..)
+if test -n "${with_target_subdir}"; then
+  AM_ENABLE_MULTILIB(, ..)
+fi
 
 AC_CANONICAL_SYSTEM
 
@@ -91,10 +93,19 @@ AC_SUBST(target_all)
 
 AC_CHECK_HEADERS(unistd.h)
 
+GCC_WITH_TOOLEXECLIBDIR
+
 if test -n "$with_cross_host" &&
    test x"$with_cross_host" != x"no"; then
   toolexecdir='$(exec_prefix)/$(target_alias)'
-  toolexeclibdir='$(toolexecdir)/lib'
+  case ${with_toolexeclibdir} in
+    no)
+      toolexeclibdir='$(toolexecdir)/lib'
+      ;;
+    *)
+      toolexeclibdir=${with_toolexeclibdir}
+      ;;
+  esac
 else
   toolexecdir='$(libdir)/gcc-lib/$(target_alias)'
   toolexeclibdir='$(libdir)'
