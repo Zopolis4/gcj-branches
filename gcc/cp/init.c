@@ -3017,11 +3017,11 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
   bool member_new_p = false;
 
-  bool member_delete_p = (!globally_qualified_p
+  bool member_delete_p = !globally_qualified_p
 			  && CLASS_TYPE_P (elt_type)
 			  && (array_p
-			      ? TYPE_GETS_VEC_DELETE (elt_type)
-			      : TYPE_GETS_REG_DELETE (elt_type)));
+			      ? TYPE_HAS_ARRAY_NEW_OPERATOR (elt_type)
+			      : TYPE_HAS_NEW_OPERATOR (elt_type));
 
   /* Allocate the object.  */
   if (vec_safe_is_empty (*placement) && TYPE_FOR_JAVA (elt_type))
@@ -3042,7 +3042,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
       use_java_new = 1;
 
-      if (!(alloc_fn = get_global_binding (get_identifier (alloc_name))))
+      if (!get_global_value_if_present (get_identifier (alloc_name), &alloc_fn))
 	{
 	  if (complain & tf_error)
 	    error ("call to Java constructor with %qs undefined", alloc_name);
@@ -3733,7 +3733,7 @@ build_java_class_ref (tree type)
     CL_suffix = get_identifier("class$");
   if (jclass_node == NULL_TREE)
     {
-      jclass_node = get_global_binding (get_identifier ("jclass"));
+      jclass_node = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jclass"));
       if (jclass_node == NULL_TREE)
 	{
 	  error ("call to Java constructor, while %<jclass%> undefined");
@@ -3759,7 +3759,7 @@ build_java_class_ref (tree type)
       }
   }
 
-  class_decl = get_global_binding (name);
+  class_decl = IDENTIFIER_GLOBAL_VALUE (name);
   if (class_decl == NULL_TREE)
     {
       class_decl = build_decl (input_location,
