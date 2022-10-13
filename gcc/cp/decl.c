@@ -7249,7 +7249,7 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
 	{
 	if (TYPE_FOR_JAVA (type) && MAYBE_CLASS_TYPE_P (type))
 	  {
-	    tree jclass = get_global_binding (get_identifier ("jclass"));
+	    tree jclass = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jclass"));
 	    /* Allow libjava/prims.cc define primitive classes.  */
 	    if (init != NULL_TREE
 		|| jclass == NULL_TREE
@@ -15652,7 +15652,6 @@ store_parm_decls (tree current_function_parms)
 static void
 save_function_data (tree decl)
 {
-<<<<<<< HEAD:gcc/cp/decl.c
   struct language_function *f;
 
   /* Save the language-specific per-function data so that we can

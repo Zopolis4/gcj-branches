@@ -40,23 +40,21 @@ details.  */
 
 extern "C"
 {
-#include <gc_config.h>
-
 // Set GC_DEBUG before including gc.h!
 #ifdef LIBGCJ_GC_DEBUG
 # define GC_DEBUG
 #endif
 
-#include <gc_mark.h>
-#include <gc_gcj.h>
-#include <javaxfc.h>  // GC_finalize_all declaration.  
+#include <gc/gc_mark.h>
+#include <gc/gc_gcj.h>
+#include <gc/javaxfc.h>  // GC_finalize_all declaration.
 
 #ifdef THREAD_LOCAL_ALLOC
 # define GC_REDIRECT_TO_LOCAL
-# include <gc_local_alloc.h>
+# include <gc/gc.h>
 #endif
 
-  // From boehm's misc.c 
+  // From boehm's misc.c
   void GC_enable();
   void GC_disable();
 };
@@ -362,17 +360,17 @@ _Jv_AllocArray (jsize size, jclass klass)
   // a pointer.   Thus we lose nothing by scanning the object
   // completely conservatively, since no misidentification can
   // take place.
-  
-  if (size < min_heap_addr) 
+
+  if (size < min_heap_addr)
     obj = GC_MALLOC(size);
-  else 
+  else
     obj = GC_generic_malloc (size, array_kind_x);
 #endif
   *((_Jv_VTable **) obj) = klass->vtable;
   return obj;
 }
 
-/* Allocate space for a new non-Java object, which does not have the usual 
+/* Allocate space for a new non-Java object, which does not have the usual
    Java object header but may contain pointers to other GC'ed objects. */
 void *
 _Jv_AllocRawObj (jsize size)
@@ -468,7 +466,9 @@ _Jv_GCSetMaximumHeapSize (size_t size)
 int
 _Jv_SetGCFreeSpaceDivisor (int div)
 {
-  return (int)GC_set_free_space_divisor ((GC_word)div);
+  int old_div = (int)GC_get_free_space_divisor ();
+  GC_set_free_space_divisor ((GC_word)div);
+  return old_div;
 }
 
 void
@@ -523,7 +523,7 @@ _Jv_InitGC (void)
   gc_initialized = 1;
 
   // Ignore pointers that do not point to the start of an object.
-  GC_all_interior_pointers = 0;
+  GC_set_all_interior_pointers(0);
 
 #if defined (HAVE_DLFCN_H) && defined (HAVE_DLADDR)
   // Tell the collector to ask us before scanning DSOs.
@@ -534,15 +534,15 @@ _Jv_InitGC (void)
   // stash in the class vtable.
   // We always use mark proc descriptor 0, since the compiler knows
   // about it.
-  GC_init_gcj_malloc (0, (void *) _Jv_MarkObj);  
+  GC_init_gcj_malloc (0, (void *) _Jv_MarkObj);
 
   // Cause an out of memory error to be thrown from the allocators,
   // instead of returning 0.  This is cheaper than checking on allocation.
-  GC_oom_fn = handle_out_of_memory;
+  GC_set_oom_fn(handle_out_of_memory);
 
-  GC_java_finalization = 1;
+  GC_set_java_finalization(1);
 
-  // We use a different mark procedure for object arrays. This code 
+  // We use a different mark procedure for object arrays. This code
   // configures a different object `kind' for object array allocation and
   // marking.
   array_free_list = GC_new_free_list();
@@ -569,7 +569,7 @@ static _Jv_VTable trace_one_vtable = {
 };
 
 void *
-_Jv_AllocTraceOne (jsize size /* includes vtable slot */) 
+_Jv_AllocTraceOne (jsize size /* includes vtable slot */)
 {
   return GC_GCJ_MALLOC (size, &trace_one_vtable);
 }
@@ -587,7 +587,7 @@ static _Jv_VTable trace_two_vtable =
 };
 
 void *
-_Jv_AllocTraceTwo (jsize size /* includes vtable slot */) 
+_Jv_AllocTraceTwo (jsize size /* includes vtable slot */)
 {
   return GC_GCJ_MALLOC (size, &trace_two_vtable);
 }
@@ -597,8 +597,8 @@ _Jv_AllocTraceTwo (jsize size /* includes vtable slot */)
 void
 _Jv_GCInitializeFinalizers (void (*notifier) (void))
 {
-  GC_finalize_on_demand = 1;
-  GC_finalizer_notifier = notifier;
+  GC_set_finalize_on_demand(1);
+  GC_set_finalizer_notifier(notifier);
 }
 
 void
@@ -641,7 +641,7 @@ find_file (const char *filename)
 {
   int index = strlen (filename) % FILENAME_STORE_SIZE;
   filename_node **node = &filename_store[index];
-  
+
   while (*node)
     {
       if (strcmp ((*node)->name, filename) == 0)
@@ -650,7 +650,7 @@ find_file (const char *filename)
     }
 
   return node;
-}  
+}
 
 // Print the store of filenames of DSOs that need collection.
 void
@@ -675,12 +675,12 @@ new_node (const char *filename)
   node->name = (char *)_Jv_Malloc (strlen (filename) + 1);
   node->link = NULL;
   strcpy (node->name, filename);
-  
+
   return node;
 }
 
 // Nonzero if the gc should scan this lib.
-static int 
+static int
 _Jv_GC_has_static_roots (const char *filename, void *, size_t)
 {
   if (filename == NULL || strlen (filename) == 0)
