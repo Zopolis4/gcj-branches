@@ -661,11 +661,8 @@ EXTRA_HOST_FLAGS = \
 	'CC=$(CC)' \
 	'CXX=$(CXX)' \
 	'DLLTOOL=$(DLLTOOL)' \
-<<<<<<< HEAD
 	'DSYMUTIL=$(DSYMUTIL)' \
-=======
 	'GCJ=$(GCJ)' \
->>>>>>> d937585b059 (Add autotools glue for Java front-end and library.)
 	'GFORTRAN=$(GFORTRAN)' \
 	'GOC=$(GOC)' \
 	'GDC=$(GDC)' \
@@ -724,11 +721,8 @@ EXTRA_TARGET_FLAGS = \
 	 $$(XGCC_FLAGS_FOR_TARGET) $$(TFLAGS)' \
 	'CXXFLAGS=$$(CXXFLAGS_FOR_TARGET)' \
 	'DLLTOOL=$$(DLLTOOL_FOR_TARGET)' \
-<<<<<<< HEAD
 	'DSYMUTIL=$$(DSYMUTIL_FOR_TARGET)' \
-=======
 	'GCJ=$$(GCJ_FOR_TARGET) $$(XGCC_FLAGS_FOR_TARGET) $$(TFLAGS)' \
->>>>>>> d937585b059 (Add autotools glue for Java front-end and library.)
 	'GFORTRAN=$$(GFORTRAN_FOR_TARGET) $$(XGCC_FLAGS_FOR_TARGET) $$(TFLAGS)' \
 	'GOC=$$(GOC_FOR_TARGET) $$(XGCC_FLAGS_FOR_TARGET) $$(TFLAGS)' \
 	'GOCFLAGS=$$(GOCFLAGS_FOR_TARGET)' \
