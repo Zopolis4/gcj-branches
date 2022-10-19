@@ -15945,7 +15945,6 @@ store_parm_decls (tree current_function_parms)
 static void
 save_function_data (tree decl)
 {
-<<<<<<< HEAD:gcc/cp/decl.c
   struct language_function *f;
 
   /* Save the language-specific per-function data so that we can
