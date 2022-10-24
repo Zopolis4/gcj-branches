@@ -1240,6 +1240,16 @@ is_late_template_attribute (tree attr, tree decl)
   if (args && PACK_EXPANSION_P (args))
     return true;
 
+  if (is_attribute_p ("aligned", name)
+      || is_attribute_p ("vector_size", name))
+    {
+      /* Attribute argument may be a dependent indentifier.  */
+      if (tree t = args ? TREE_VALUE (args) : NULL_TREE)
+        if (value_dependent_expression_p (t)
+            || type_dependent_expression_p (t))
+          return true;
+    }
+
   /* If any of the arguments are dependent expressions, we can't evaluate
      the attribute until instantiation time.  */
   for (arg = args; arg; arg = TREE_CHAIN (arg))
@@ -1250,8 +1260,7 @@ is_late_template_attribute (tree attr, tree decl)
 	 second and following arguments.  Attributes like mode, format,
 	 cleanup and several target specific attributes aren't late
 	 just because they have an IDENTIFIER_NODE as first argument.  */
-      if (arg == args && attribute_takes_identifier_p (name)
-	  && identifier_p (t))
+      if (!is_attribute_p ("aligned", name) && arg == args && identifier_p (t))
 	continue;
 
       if (value_dependent_expression_p (t)

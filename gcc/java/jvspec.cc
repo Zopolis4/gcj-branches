@@ -26,7 +26,6 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "system.h"
 #include "coretypes.h"
 #include "tm.h"
-#include "opt-suggestions.h"
 #include "gcc.h"
 #include "jcf.h"
 #include "opts.h"
@@ -278,7 +277,7 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
 	  break;
 
 	case OPT_g:
-	case OPT_gcoff:
+	//case OPT_gcoff:
 	case OPT_gdwarf_:
 	case OPT_ggdb:
 	case OPT_gstabs:

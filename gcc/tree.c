@@ -5112,12 +5112,16 @@ free_lang_data_in_type (tree type)
       TYPE_MIN_VALUE (type) = NULL;
     }
   else if (TREE_CODE (type) == METHOD_TYPE)
+    {
     for (tree p = TYPE_ARG_TYPES (type); p; p = TREE_CHAIN (p))
+      {
       /* C++ FE uses TREE_PURPOSE to store initial values.  */
       TREE_PURPOSE (p) = NULL;
+      }
 
     /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
     TYPE_MIN_VALUE (type) = NULL;
+    }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {
       /* Remove members that are not FIELD_DECLs from the field list
