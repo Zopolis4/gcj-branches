@@ -9087,7 +9087,7 @@ build_over_call (struct z_candidate *cand, int flags, tsubst_flags_t complain)
       if (DECL_CONTEXT (fn) && TYPE_JAVA_INTERFACE (DECL_CONTEXT (fn)))
 	fn = build_java_interface_fn_ref (fn, argarray[0]);
       else
-      fn = build_vfn_ref (argarray[0], DECL_VINDEX (fn));
+	fn = build_vfn_ref (argarray[0], DECL_VINDEX (fn));
       TREE_TYPE (fn) = t;
     }
   else
@@ -9695,7 +9695,7 @@ build_java_interface_fn_ref (tree fn, tree instance)
 
   /* Determine the itable index of FN.  */
   i = 1;
-  for (method = TYPE_METHODS (iface); method; method = DECL_CHAIN (method))
+  for (method = TYPE_FIELDS (iface); method; method = DECL_CHAIN (method))
     {
       if (!DECL_VIRTUAL_P (method))
 	continue;
