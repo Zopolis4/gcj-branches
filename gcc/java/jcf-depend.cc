@@ -134,6 +134,7 @@ jcf_dependency_write (void)
   gcc_assert (dependencies);
 
   deps_write (dependencies, dep_out, 72);
+
   if (print_dummies)
     deps_phony_targets (dependencies, dep_out);
 
