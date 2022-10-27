@@ -5694,6 +5694,7 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 		tem = TREE_CHAIN (tem);
 	      }
 	    while (tem);
+        }
       if (RECORD_OR_UNION_TYPE_P (t))
 	{
 	  tree tem;

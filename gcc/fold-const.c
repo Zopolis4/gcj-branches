@@ -9736,8 +9736,8 @@ fold_binary_loc (location_t loc,
     case MINUS_EXPR:
       /* (-A) - B -> (-B) - A  where B is easily negated and we can swap.  */
       if (TREE_CODE (arg0) == NEGATE_EXPR
-	  && negate_expr_p (op1))
-          && reorder_operands_p (arg0, arg1)
+	  && negate_expr_p (op1)
+          && reorder_operands_p (arg0, arg1))
 	return fold_build2_loc (loc, MINUS_EXPR, type,
 				negate_expr (op1),
 				fold_convert_loc (loc, type,

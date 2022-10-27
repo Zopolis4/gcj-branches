@@ -8267,15 +8267,9 @@ build_java_interface_fn_ref (tree fn, tree instance)
 
   /* Look up the pointer to the runtime java.lang.Class object for `instance'.
      This is the first entry in the vtable.  */
-    // why is this cp_build_fold_indirect_ref not cp_build_indirect_ref
-    //https://github.com/Zopolis4/gcj/commit/bfecd57cd46ac368213f55fc4a3ff67c8c59c5ea#diff-3501f5408fadfd7a97df1291832970e26ef53f7051be440088c0d22c2ef37656L8073
-    // ig i was looking at https://gcc.gnu.org/git/?p=gcc.git;a=blobdiff;f=gcc/cp/decl.c;h=7e16f7b415bb079666f59e834ab20a545597db5d;hp=041893db937443a5f7d9302a202c8769981d0ba4;hb=86a9e738370e25b9ddb1d444fd99f9173309ce19;hpb=134d23547e10276280b1022c4463cc1f52bab831
-    //even still
-    // i am pulling this loc out of my ass
-    // https://github.com/Zopolis4/gcj/commit/3554d8ffc5a55f4173feb30619fab4131ba46032
-  klass_ref = build_vtbl_ref (cp_build_fold_indirect_ref (instance),
-  						  //   tf_warning_or_error),
-			      integer_zero_node);
+  klass_ref = build_vtbl_ref (cp_build_indirect_ref (instance, RO_NULL, 
+                                                     tf_warning_or_error),
+                             integer_zero_node);
 
   /* Get the java.lang.Class pointer for the interface being called.  */
   iface = DECL_CONTEXT (fn);

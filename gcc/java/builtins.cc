@@ -473,7 +473,8 @@ define_builtin (enum built_in_function val,
   TREE_PUBLIC (decl) = 1;
   SET_DECL_ASSEMBLER_NAME (decl, get_identifier (libname));
   pushdecl (decl);
-  set_decl_built_in_function (decl, BUILT_IN_NORMAL, val);
+  DECL_BUILT_IN_CLASS (decl) = BUILT_IN_NORMAL;
+  DECL_FUNCTION_CODE (decl) = val;
   set_call_expr_flags (decl, flags);
 
   set_builtin_decl (val, decl, true);
