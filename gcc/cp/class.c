@@ -3413,12 +3413,6 @@ add_implicitly_declared_members (tree t, tree* access_decls,
 	lazily_declare_fn (sfk_destructor, t);
     }
 
-  bool move_ok = false;
-  if (cxx_dialect >= cxx11 && CLASSTYPE_LAZY_DESTRUCTOR (t)
-      && !TYPE_HAS_COPY_CTOR (t) && !TYPE_HAS_COPY_ASSIGN (t)
-      && !classtype_has_move_assign_or_move_ctor_p (t, false))
-    move_ok = true;
-
   /* [class.ctor]
 
      If there is no user-declared constructor for a class, a default

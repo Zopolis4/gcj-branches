@@ -286,7 +286,7 @@ decl_is_java_type (tree decl, int err)
       if (r)
 	{
 	  tree jthrow_node
-	    = get_global_binding (get_identifier ("jthrowable"));
+	    = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jthrowable"));
 
 	  if (jthrow_node == NULL_TREE)
 	    fatal_error
@@ -349,7 +349,7 @@ choose_personality_routine (enum languages lang)
 
     case lang_java:
       state = chose_java;
-      terminate_fn = builtin_decl_explicit (BUILT_IN_ABORT);
+      terminate_node = builtin_decl_explicit (BUILT_IN_ABORT);
       pragma_java_exceptions = true;
       break;
 
@@ -505,7 +505,7 @@ expand_start_catch_block (tree decl)
 		   fold_build1_loc (input_location,
 				    NEGATE_EXPR, sizetype,
 				    TYPE_SIZE_UNIT (TREE_TYPE (exp))));
-      exp = cp_build_fold_indirect_ref (exp);
+      exp = cp_build_indirect_ref (exp, RO_NULL, tf_warning_or_error);
       //exp = cp_build_indirect_ref (exp, RO_NULL, tf_warning_or_error);
       //https://github.com/Zopolis4/gcj/commit/bfecd57cd46ac368213f55fc4a3ff67c8c59c5ea#diff-8b7d072f59ef503b17b334469b51c63669190d4db3f08629de0142a2711b7830L504
       initialize_handler_parm (decl, exp);
@@ -746,21 +746,21 @@ build_throw (tree exp)
 
   if (exp && decl_is_java_type (TREE_TYPE (exp), 1))
     {
-      tree name = get_identifier ("_Jv_Throw");
-      tree fn = get_global_binding (name);
+      tree fn = get_identifier ("_Jv_Throw");
       if (!fn)
        {
 	 /* Declare void _Jv_Throw (void *).  */
 	 tree tmp;
 	 tmp = build_function_type_list (ptr_type_node,
 					 ptr_type_node, NULL_TREE);
-	 fn = push_throw_library_fn (name, tmp);
+	 fn = push_throw_library_fn (fn, tmp);
        }
       else if (really_overloaded_fn (fn))
        {
 	 error ("%qD should never be overloaded", fn);
 	 return error_mark_node;
        }
+      fn = OVL_CURRENT (TREE_VALUE (fn));
       exp = cp_build_function_call_nary (fn, tf_warning_or_error,
 					exp, NULL_TREE);
     }
