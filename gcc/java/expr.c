@@ -2254,7 +2254,7 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       ref = build3 (COMPONENT_REF, method_ptr_type_node, ref,
 		    lookup_field (&class_type_node, methods_ident),
 		    NULL_TREE);
-      for (meth = TYPE_METHODS (self_type);
+      for (meth = TYPE_FIELDS (self_type); //nn
 	   ; meth = DECL_CHAIN (meth))
 	{
 	  if (method == meth)

@@ -641,7 +641,7 @@ shallow_find_method (tree searched_class, int flags, tree method_name,
 	     tree signature, tree (*signature_builder) (tree))
 {
   tree method;
-  for (method = TYPE_METHODS (searched_class);
+  for (method = TYPE_FIELDS (searched_class); //nn
        method != NULL_TREE;  method = DECL_CHAIN (method))
     {
       tree method_sig = (*signature_builder) (TREE_TYPE (method));
@@ -776,7 +776,7 @@ lookup_do (tree searched_class, int flags, tree method_name,
 tree
 lookup_java_constructor (tree clas, tree method_signature)
 {
-  tree method = TYPE_METHODS (clas);
+  tree method = TYPE_FIELDS (clas); //nn
   for ( ; method != NULL_TREE;  method = DECL_CHAIN (method))
     {
       tree method_sig = build_java_signature (TREE_TYPE (method));

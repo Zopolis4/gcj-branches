@@ -147,6 +147,8 @@ AM_CONDITIONAL(JAVA_MAINTAINER_MODE, test "$enable_java_maintainer_mode" = yes)
 # It may not be safe to run linking tests in AC_PROG_CC/AC_PROG_CXX.
 GCC_NO_EXECUTABLES
 
+AM_INIT_AUTOMAKE([no-dist 1.9.0])
+
 # For libstdc++-v3, -fno-builtin must be present here so that a
 # non-conflicting form of std::exit can be guessed by AC_PROG_CXX, and
 # used in later tests.  This may not be necessary in libjava; I don't know.
@@ -155,8 +157,6 @@ CXXFLAGS="$CXXFLAGS -fno-builtin"
 AC_PROG_CC
 AC_PROG_CXX
 CXXFLAGS="$save_CXXFLAGS"
-
-AM_INIT_AUTOMAKE([no-dist 1.9.0])
 
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(LD, ld)

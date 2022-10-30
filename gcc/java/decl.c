@@ -1944,7 +1944,7 @@ java_mark_class_local (tree klass)
     if (FIELD_STATIC (t))
       java_mark_decl_local (t);
 
-  for (t = TYPE_METHODS (klass); t ; t = DECL_CHAIN (t))
+  for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t)) //nn
     if (!METHOD_ABSTRACT (t))
       {
 	if (METHOD_NATIVE (t) && !flag_jni)
