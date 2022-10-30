@@ -3031,9 +3031,8 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	return error_mark_node;
 
       use_java_new = 1;
-      tree name = get_identifier (alloc_name);
-      tree alloc_fn = IDENTIFIER_GLOBAL_VALUE (name);
-      if (!alloc_fn)
+
+      if (!(alloc_fn = IDENTIFIER_GLOBAL_VALUE (get_identifier (alloc_name))))
 	{
           if (complain & tf_error)
             error ("call to Java constructor with %qs undefined", alloc_name);
