@@ -1197,7 +1197,7 @@ int cxx_keyword_p (const char *name, int length);
 
 /* Access flags etc for a method (a FUNCTION_DECL): */
 
-#define METHOD_DUMMY(DECL) (DECL_LANG_SPECIFIC (DECL)->u.f.dummy)
+#define METHOD_DUMMY(DECL) (DECL_LANG_SPECIFIC (FUNCTION_DECL_CHECK (DECL))->u.f.dummy)
 
 #define METHOD_PUBLIC(DECL) DECL_LANG_FLAG_1 (FUNCTION_DECL_CHECK (DECL))
 #define METHOD_PRIVATE(DECL) TREE_PRIVATE (FUNCTION_DECL_CHECK (DECL))
@@ -1429,7 +1429,10 @@ extern tree *type_map;
   do \
     { \
       vec_alloc (V, 0); \
-      CONSTRUCTOR_APPEND_ELT (V, TYPE_FIELDS (CTYPE), NULL); \
+      tree ctype_field = TYPE_FIELDS (CTYPE); \
+      if ((TREE_CODE (ctype_field) == FUNCTION_DECL) || (TREE_CODE (ctype_field) == TEMPLATE_DECL)) \
+        continue; \
+      CONSTRUCTOR_APPEND_ELT (V, ctype_field, NULL); \
     } \
   while (0)
 
@@ -1441,7 +1444,7 @@ extern tree *type_map;
     { \
       constructor_elt *_elt___ = &(V)->last (); \
       tree _next___ = DECL_CHAIN (_elt___->index); \
-      gcc_assert (!DECL_NAME (_elt___->index)); \
+      gcc_checking_assert (!DECL_NAME (_elt___->index)); \
       _elt___->value = VALUE; \
       CONSTRUCTOR_APPEND_ELT (V, _next___, NULL); \
     } \

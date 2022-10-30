@@ -1569,6 +1569,9 @@ parse_class_file (void)
     {
       JCF *jcf = current_jcf;
 
+      if (TREE_CODE (method) != FUNCTION_DECL)
+        continue;
+
       if (METHOD_ABSTRACT (method) || METHOD_DUMMY (method))
 	continue;
 

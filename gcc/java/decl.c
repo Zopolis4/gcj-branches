@@ -1940,12 +1940,13 @@ java_mark_class_local (tree klass)
 {
   tree t;
 
+  //oooooooooh ok so since type_fields got changed to also include function_decl it breaks this
   for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
-    if (FIELD_STATIC (t))
+    if ((TREE_CODE (t) != FUNCTION_DECL) && FIELD_STATIC (t))
       java_mark_decl_local (t);
 
   for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t)) //nn
-    if (!METHOD_ABSTRACT (t))
+    if ((TREE_CODE (t) == FUNCTION_DECL) && !METHOD_ABSTRACT (t))
       {
 	if (METHOD_NATIVE (t) && !flag_jni)
 	  java_mark_cni_decl_local (t);

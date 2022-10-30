@@ -1577,6 +1577,9 @@ get_dispatch_vector (tree type)
       for (method = TYPE_FIELDS (type);  method != NULL_TREE; //nn
 	   method = DECL_CHAIN (method))
 	{
+          if (TREE_CODE (method) == FIELD_DECL)
+            continue;
+
 	  tree method_index = get_method_index (method);
 	  if (method_index != NULL_TREE
 	      && tree_fits_shwi_p (method_index))
@@ -1828,6 +1831,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  if (FIELD_STATIC (field))
 	    static_field_count++;
 	  else if (uses_jv_markobj || !flag_reduced_reflection)
@@ -1857,6 +1863,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  field_index = 0;
 	  if (FIELD_STATIC (field))
 	    field_index = static_count++;
@@ -1874,6 +1883,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  if (FIELD_STATIC (field))
 	    {
               /* We must always create reflection data for static fields
@@ -1922,6 +1934,10 @@ make_class_data (tree type)
        method != NULL_TREE; method = DECL_CHAIN (method))
     {
       tree init;
+
+      if (TREE_CODE (method) != FUNCTION_DECL)
+        continue;
+
       if (METHOD_PRIVATE (method)
 	  && ! flag_keep_inline_functions
 	  && optimize)
@@ -2073,6 +2089,7 @@ make_class_data (tree type)
     PUSH_FIELD_VALUE (v1, "sync_info", null_pointer_node);
   FINISH_RECORD_CONSTRUCTOR (temp, v1, object_type_node);
   START_RECORD_CONSTRUCTOR (v2, class_type_node);
+  //if ((TREE_CODE (TYPE_FIELDS (temp)) != FUNCTION_DECL) || (TREE_CODE (TYPE_FIELDS (temp)) != TEMPLATE_DECL))
   PUSH_SUPER_VALUE (v2, temp);
   PUSH_FIELD_VALUE (v2, "next_or_version", gcj_abi_version);
   PUSH_FIELD_VALUE (v2, "name", build_utf8_ref (DECL_NAME (type_decl)));
@@ -2534,7 +2551,10 @@ add_miranda_methods (tree base_class, tree search_class)
 	  if (ID_CLINIT_P (DECL_NAME (method_decl)))
 	    continue;
 
-	  sig = build_java_argument_signature (TREE_TYPE (method_decl));
+          if ((TREE_CODE (TREE_TYPE (method_decl)) != FUNCTION_TYPE) || (TREE_CODE (TREE_TYPE (method_decl)) != METHOD_TYPE))
+            continue;
+
+          sig = build_java_argument_signature (TREE_TYPE (method_decl));
 	  override = lookup_argument_method (base_class,
 					     DECL_NAME (method_decl), sig);
 	  if (override == NULL_TREE)
@@ -2591,8 +2611,13 @@ layout_class_methods (tree this_class)
 
   for (method_decl = TYPE_FIELDS (this_class); //nn
        method_decl; method_decl = DECL_CHAIN (method_decl))
-    dtable_count = layout_class_method (this_class, super_class,
-					method_decl, dtable_count);
+    {
+      if (TREE_CODE (method_decl) != FUNCTION_DECL)
+        continue;
+
+      dtable_count = layout_class_method (this_class, super_class,
+					  method_decl, dtable_count);
+    }
 
   TYPE_NVIRTUALS (this_class) = dtable_count;
 }
