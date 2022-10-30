@@ -6,6 +6,7 @@ dnl -----------------------------------------------------------
 dnl define([AC_CACHE_LOAD], )dnl
 dnl define([AC_CACHE_SAVE], )dnl
 
+m4_define([_GCC_AUTOCONF_VERSION], [2.69])]
 AC_INIT([GNU Classpath],[0.99.1-pre],[classpath@gnu.org],[classpath])
 AC_CONFIG_SRCDIR(java/lang/System.java)
 AC_CONFIG_MACRO_DIR([m4])
@@ -422,7 +423,7 @@ dnl -----------------------------------------------------------
 dnl Enable tool wrapper binaries (disabled by default)
 dnl -----------------------------------------------------------
 AC_ARG_ENABLE([tool-wrappers],
-              [AS_HELP_STRING(--enable-tool-wrappers,create tool wrapper binaries [default=no])],
+              [AS_HELP_STRING(--enable-tool-wrappers,create tool wrapper binaries [default=yes])],
               [case x"${enableval}" in
                 xyes)
                   COMPILE_WRAPPERS=yes;
