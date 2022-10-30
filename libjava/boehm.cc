@@ -40,20 +40,18 @@ details.  */
 
 extern "C"
 {
-#include <gc_config.h>
-
 // Set GC_DEBUG before including gc.h!
 #ifdef LIBGCJ_GC_DEBUG
 # define GC_DEBUG
 #endif
 
-#include <gc_mark.h>
-#include <gc_gcj.h>
-#include <javaxfc.h>  // GC_finalize_all declaration.  
+#include <gc/gc_mark.h>
+#include <gc/gc_gcj.h>
+#include <gc/javaxfc.h>  // GC_finalize_all declaration.
 
 #ifdef THREAD_LOCAL_ALLOC
 # define GC_REDIRECT_TO_LOCAL
-# include <gc_local_alloc.h>
+# include <gc/gc.h>
 #endif
 
   // From boehm's misc.c 
@@ -62,7 +60,7 @@ extern "C"
 };
 
 #define MAYBE_MARK(Obj, Top, Limit, Source)  \
-	Top=GC_MARK_AND_PUSH((GC_PTR) Obj, Top, Limit, (GC_PTR *) Source)
+        Top=GC_MARK_AND_PUSH((GC_PTR) Obj, Top, Limit, (GC_PTR *) Source)
 
 // `kind' index used when allocating Java arrays.
 static int array_kind_x;
@@ -83,7 +81,7 @@ _Jv_MarkObj (void *addr, void *msp, void *msl, void *env)
   struct GC_ms_entry *mark_stack_ptr = (struct GC_ms_entry *)msp;
   struct GC_ms_entry *mark_stack_limit = (struct GC_ms_entry *)msl;
 
-  if (env == (void *)1) /* Object allocated with debug allocator.	*/
+  if (env == (void *)1) /* Object allocated with debug allocator.       */
     addr = (GC_PTR)GC_USR_PTR_FROM_BASE(addr);
   jobject obj = (jobject) addr;
 
@@ -121,7 +119,7 @@ _Jv_MarkObj (void *addr, void *msp, void *msl, void *env)
       // incremental collection.
       // If we overflow the mark stack, we will rescan the class object, so we should
       // be OK.  The same applies if we redo the mark phase because win32 unmapped part
-      // of our root set.		- HB
+      // of our root set.               - HB
       jclass c = (jclass) addr;
 
       p = (GC_PTR) c->name;
@@ -187,22 +185,22 @@ _Jv_MarkObj (void *addr, void *msp, void *msl, void *env)
       // can happen if a GC occurs between the point where an object
       // is allocated and where the vtbl slot is set.
       while (klass && klass != &java::lang::Object::class$)
-	{
-	  jfieldID field = JvGetFirstInstanceField (klass);
-	  jint max = JvNumInstanceFields (klass);
+        {
+          jfieldID field = JvGetFirstInstanceField (klass);
+          jint max = JvNumInstanceFields (klass);
 
-	  for (int i = 0; i < max; ++i)
-	    {
-	      if (JvFieldIsRef (field))
-		{
-		  jobject val = JvGetObjectField (obj, field);
-		  p = (GC_PTR) val;
-		  MAYBE_MARK (p, mark_stack_ptr, mark_stack_limit, obj);
-		}
-	      field = field->getNextField ();
-	    }
-	  klass = klass->getSuperclass();
-	}
+          for (int i = 0; i < max; ++i)
+            {
+              if (JvFieldIsRef (field))
+                {
+                  jobject val = JvGetObjectField (obj, field);
+                  p = (GC_PTR) val;
+                  MAYBE_MARK (p, mark_stack_ptr, mark_stack_limit, obj);
+                }
+              field = field->getNextField ();
+            }
+          klass = klass->getSuperclass();
+        }
     }
 
   return mark_stack_ptr;
@@ -217,7 +215,7 @@ _Jv_MarkArray (void *addr, void *msp, void *msl, void *env)
   struct GC_ms_entry *mark_stack_ptr = (struct GC_ms_entry *)msp;
   struct GC_ms_entry *mark_stack_limit = (struct GC_ms_entry *)msl;
 
-  if (env == (void *)1) /* Object allocated with debug allocator.	*/
+  if (env == (void *)1) /* Object allocated with debug allocator.       */
     addr = (void *)GC_USR_PTR_FROM_BASE(addr);
   jobjectArray array = (jobjectArray) addr;
 
@@ -279,24 +277,24 @@ _Jv_BuildGCDescr(jclass self)
       int count = JvNumInstanceFields(klass);
 
       for (int i = 0; i < count; ++i)
-	{
-	  if (field->isRef())
-	    {
-	      unsigned int off = field->getOffset();
-	      // If we run into a weird situation, we bail.
-	      if (off % sizeof (void *) != 0)
-		return (void *) (GCJ_DEFAULT_DESCR);
-	      off /= sizeof (void *);
-	      // If we find a field outside the range of our bitmap,
-	      // fall back to procedure marker. The bottom 2 bits are
-	      // reserved.
-	      if (off >= (unsigned) bits_per_word - 2)
-		return (void *) (GCJ_DEFAULT_DESCR);
-	      desc |= 1ULL << (bits_per_word - off - 1);
-	    }
+        {
+          if (field->isRef())
+            {
+              unsigned int off = field->getOffset();
+              // If we run into a weird situation, we bail.
+              if (off % sizeof (void *) != 0)
+                return (void *) (GCJ_DEFAULT_DESCR);
+              off /= sizeof (void *);
+              // If we find a field outside the range of our bitmap,
+              // fall back to procedure marker. The bottom 2 bits are
+              // reserved.
+              if (off >= (unsigned) bits_per_word - 2)
+                return (void *) (GCJ_DEFAULT_DESCR);
+              desc |= 1ULL << (bits_per_word - off - 1);
+            }
 
-	  field = field->getNextField();
-	}
+          field = field->getNextField();
+        }
     }
 
   // For bitmap mark type, bottom bits are 01.
@@ -400,7 +398,7 @@ _Jv_ClosureListFinalizer ()
   _Jv_ClosureList **clpp;
   clpp = (_Jv_ClosureList **)_Jv_AllocBytes (sizeof (*clpp));
   GC_REGISTER_FINALIZER_UNREACHABLE (clpp, finalize_closure_list,
-				     NULL, NULL, NULL);
+                                     NULL, NULL, NULL);
   return clpp;
 }
 #endif // INTERPRETER
@@ -418,7 +416,7 @@ void
 _Jv_RegisterFinalizer (void *object, _Jv_FinalizerFunc *meth)
 {
   GC_REGISTER_FINALIZER_NO_ORDER (object, call_finalizer, (GC_PTR) meth,
-				  NULL, NULL);
+                                  NULL, NULL);
 }
 
 void
@@ -468,7 +466,9 @@ _Jv_GCSetMaximumHeapSize (size_t size)
 int
 _Jv_SetGCFreeSpaceDivisor (int div)
 {
-  return (int)GC_set_free_space_divisor ((GC_word)div);
+  int old_div = (int)GC_get_free_space_divisor ();
+  GC_set_free_space_divisor ((GC_word)div);
+  return old_div;
 }
 
 void
@@ -523,7 +523,7 @@ _Jv_InitGC (void)
   gc_initialized = 1;
 
   // Ignore pointers that do not point to the start of an object.
-  GC_all_interior_pointers = 0;
+  GC_set_all_interior_pointers(0);
 
 #if defined (HAVE_DLFCN_H) && defined (HAVE_DLADDR)
   // Tell the collector to ask us before scanning DSOs.
@@ -538,9 +538,9 @@ _Jv_InitGC (void)
 
   // Cause an out of memory error to be thrown from the allocators,
   // instead of returning 0.  This is cheaper than checking on allocation.
-  GC_oom_fn = handle_out_of_memory;
+  GC_set_oom_fn(handle_out_of_memory);
 
-  GC_java_finalization = 1;
+  GC_set_java_finalization(1);
 
   // We use a different mark procedure for object arrays. This code 
   // configures a different object `kind' for object array allocation and
@@ -560,12 +560,12 @@ _Jv_InitGC (void)
 // Eventually this should probably be generalized.
 
 static _Jv_VTable trace_one_vtable = {
-    0, 			// class pointer
+    0,                  // class pointer
     (void *)(2 * sizeof(void *)),
-			// descriptor; scan 2 words incl. vtable ptr.
-			// Least significant bits must be zero to
-			// identify this as a length descriptor
-    {0}			// First method
+                        // descriptor; scan 2 words incl. vtable ptr.
+                        // Least significant bits must be zero to
+                        // identify this as a length descriptor
+    {0}                 // First method
 };
 
 void *
@@ -580,10 +580,10 @@ _Jv_AllocTraceOne (jsize size /* includes vtable slot */)
 
 static _Jv_VTable trace_two_vtable =
 {
-  0, 			// class pointer
+  0,                    // class pointer
   (void *)(3 * sizeof(void *)),
-			// descriptor; scan 3 words incl. vtable ptr.
-  {0}			// First method
+                        // descriptor; scan 3 words incl. vtable ptr.
+  {0}                   // First method
 };
 
 void *
@@ -597,8 +597,8 @@ _Jv_AllocTraceTwo (jsize size /* includes vtable slot */)
 void
 _Jv_GCInitializeFinalizers (void (*notifier) (void))
 {
-  GC_finalize_on_demand = 1;
-  GC_finalizer_notifier = notifier;
+  GC_set_finalize_on_demand(1);
+  GC_set_finalizer_notifier(notifier);
 }
 
 void
@@ -645,7 +645,7 @@ find_file (const char *filename)
   while (*node)
     {
       if (strcmp ((*node)->name, filename) == 0)
-	return node;
+        return node;
       node = &(*node)->link;
     }
 
@@ -660,10 +660,10 @@ _Jv_print_gc_store (void)
     {
       filename_node *node = filename_store[i];
       while (node)
-	{
-	  fprintf (stderr, "%s\n", node->name);
-	  node = node->link;
-	}
+        {
+          fprintf (stderr, "%s\n", node->name);
+          node = node->link;
+        }
     }
 }
 
@@ -707,7 +707,7 @@ _Jv_RegisterLibForGc (const void *p __attribute__ ((__unused__)))
     {
       filename_node **node = find_file (info.dli_fname);
       if (! *node)
-	*node = new_node (info.dli_fname);
+        *node = new_node (info.dli_fname);
     }
 #endif
 }
