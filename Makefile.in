@@ -58905,11 +58905,9 @@ all-target-libgo: maybe-all-target-libbacktrace
 all-target-libgo: maybe-all-target-libffi
 all-target-libgo: maybe-all-target-libatomic
 configure-target-libjava: maybe-configure-target-zlib
-configure-target-libjava: maybe-configure-target-boehm-gc
 configure-target-libjava: maybe-configure-target-libffi
 all-target-libjava: maybe-all-fastjar
 all-target-libjava: maybe-all-target-zlib
-all-target-libjava: maybe-all-target-boehm-gc
 all-target-libjava: maybe-all-target-libffi
 configure-target-libstdc++-v3: maybe-configure-target-libgomp
 

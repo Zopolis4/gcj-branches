@@ -1,10 +1,10 @@
 dnl # Process this with autoconf to create configure
 
-sinclude(../config/sjlj.m4)
-
-AC_PREREQ(2.64)
+AC_PREREQ([2.69])
+m4_define([_GCC_AUTOCONF_VERSION], [2.69])]
 # Still use "libjava" here to placate dejagnu.
 AC_INIT([libjava], [version-unused],, [libjava])
+AM_INIT_AUTOMAKE([no-dist])
 
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
@@ -147,7 +147,6 @@ AM_CONDITIONAL(JAVA_MAINTAINER_MODE, test "$enable_java_maintainer_mode" = yes)
 # It may not be safe to run linking tests in AC_PROG_CC/AC_PROG_CXX.
 GCC_NO_EXECUTABLES
 
-AM_INIT_AUTOMAKE([no-dist 1.9.0])
 
 # For libstdc++-v3, -fno-builtin must be present here so that a
 # non-conflicting form of std::exit can be guessed by AC_PROG_CXX, and
@@ -246,10 +245,7 @@ AC_SUBST(LIBGCJ_LD_SYMBOLIC)
 AC_SUBST(LIBGCJ_LD_SYMBOLIC_FUNCTIONS)
 AC_SUBST(LIBGCJ_LD_EXPORT_ALL)
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LTDL_SHLIBPATH
-fi
+LT_SYS_MODULE_PATH
 
 AC_CONFIG_HEADERS([include/config.h gcj/libgcj-config.h])
 
@@ -548,27 +544,22 @@ dnl --with-javah=$GCJH
 dnl gtk-cairo -- just export here...
 dnl --enable-regen-headers?
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LIBLTDL_CONVENIENCE
-   AC_LIBTOOL_DLOPEN
-   DIRLTDL=libltdl
-   AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.])
-   # Sigh.  Libtool's macro doesn't do the right thing.
-   INCLTDL="-I\$(top_srcdir)/libltdl $INCLTDL"
-   # FIXME: this is a hack.
-   sub_auxdir="`cd $ac_aux_dir && ${PWDCMD-pwd}`"
-   ac_configure_args="$ac_configure_args --with-auxdir=$sub_auxdir"
+LT_INIT([dlopen])
+AC_CHECK_HEADERS(ltdl.h)
+if test "$ac_cv_header_ltdl_h" = "no"; then
+  AC_MSG_ERROR(cannot find ltdl.h)
 fi
-AC_SUBST(INCLTDL)
+
+LTDL_INIT()
+AC_CHECK_LIB([ltdl], [lt_dlhandle_map], [], [AC_MSG_ERROR([installed libltdl is too old])])
+AC_SUBST(LTDLINCL)
 AC_SUBST(LIBLTDL)
-AC_SUBST(DIRLTDL)
-AC_PROG_LIBTOOL
+LT_SYS_MODULE_PATH
 ACX_LT_HOST_FLAGS
 AM_PROG_GCJ
 AM_PROG_CC_C_O
 
-AC_CONFIG_SUBDIRS(classpath libltdl)
+AC_CONFIG_SUBDIRS(classpath)
 
 # The -no-testsuite modules omit the test subdir.
 AM_CONDITIONAL(TESTSUBDIR, test -d $srcdir/testsuite)
@@ -1858,12 +1849,6 @@ fi
 
 AC_CONFIG_LINKS(include/java-signal.h:$SIGNAL_HANDLER
 		include/java-signal-aux.h:$SIGNAL_HANDLER_AUX)
-
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
 
 # See if we support thread-local storage.
 GCC_CHECK_TLS
