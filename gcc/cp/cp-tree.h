@@ -2806,7 +2806,7 @@ enum lang_decl_selector
 
 struct GTY(()) lang_decl_base {
   ENUM_BITFIELD(lang_decl_selector) selector : 3;
-  ENUM_BITFIELD(languages) language : 1;
+  ENUM_BITFIELD(languages) language : 2;
   unsigned use_template : 2;
   unsigned not_really_extern : 1;	   /* var or fn */
   unsigned initialized_in_class : 1;	   /* var or fn */
