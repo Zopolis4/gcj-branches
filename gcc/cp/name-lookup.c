@@ -6949,6 +6949,9 @@ do_pushtag (tree name, tree type, TAG_how how)
 	      && b->level_chain->kind == sk_class))
 	in_class = 1;
 
+      if (current_lang_name == lang_name_java)
+	TYPE_FOR_JAVA (type) = 1;
+
       tdef = create_implicit_typedef (name, type);
       DECL_CONTEXT (tdef) = FROB_CONTEXT (context);
       decl = maybe_process_template_type_declaration
