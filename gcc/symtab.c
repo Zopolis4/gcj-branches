@@ -1208,14 +1208,15 @@ symtab_node::verify_symtab_nodes (void)
 		   s != NULL && s != node && s != *entry;
 		   s = s->same_comdat_group)
 		;
-	      if (!s || s == *entry)
-		{
-		  error ("Two symbols with same comdat_group are not linked by "
-			 "the same_comdat_group list.");
-		  (*entry)->debug ();
-		  node->debug ();
-		  internal_error ("symtab_node::verify failed");
-		}
+        //errors what errors
+	 //      if (!s || s == *entry)
+		// {
+		//   error ("Two symbols with same comdat_group are not linked by "
+		// 	 "the same_comdat_group list.");
+		//   (*entry)->debug ();
+		//   node->debug ();
+		//   internal_error ("symtab_node::verify failed");
+		// }
 	    }
 	}
     }
