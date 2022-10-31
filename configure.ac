@@ -142,6 +142,11 @@ host_libs="intl libiberty opcodes bfd readline tcl tk itcl libgui zlib libbacktr
 # If --enable-gold is used, "gold" may replace "ld".
 host_tools="texinfo flex bison binutils gas ld fixincludes gcc cgen sid sim gdb gprof etc expect dejagnu m4 utils guile fastjar gnattools libcc1 gotools"
 
+# libgcj represents the runtime libraries only used by gcj.
+libgcj="target-libffi \
+	target-zlib \
+	target-libjava"
+
 # these libraries are built for the target environment, and are built after
 # the host libraries and the host tools (which may be a cross compiler)
 # Note that libiberty is not a target library.
@@ -163,6 +168,7 @@ target_libraries="target-libgcc \
 		target-libgfortran \
 		target-boehm-gc \
 		target-libffi \
+                target-libjava
 		target-libobjc \
 		target-libada \
 		target-libgo"
@@ -502,6 +508,41 @@ else
 fi])
 AC_SUBST(extra_liboffloadmic_configure_flags)
 
+# Save it here so that, even in case of --enable-libgcj, if the Java
+# front-end isn't enabled, we still get libgcj disabled.
+libgcj_saved=$libgcj
+case $enable_libgcj in
+yes)
+  # If we reset it here, it won't get added to noconfigdirs in the
+  # target-specific build rules, so it will be forcibly enabled
+  # (unless the Java language itself isn't enabled).
+  libgcj=
+  ;;
+no)
+  # Make sure we get it printed in the list of not supported target libs.
+  # Don't disable libffi, though, other languages use it.
+  noconfigdirs="$noconfigdirs `echo ${libgcj} | sed -e 's/target-libffi//'`"
+  # Clear libgcj_saved so that even if java is enabled libffi won't be
+  # built.
+  libgcj_saved=
+  ;;
+esac
+
+AC_ARG_ENABLE(static-libjava,
+[AS_HELP_STRING([[--enable-static-libjava[=ARG]]],
+		[build static libjava @<:@default=no@:>@])],
+ENABLE_STATIC_LIBJAVA=$enableval,
+ENABLE_STATIC_LIBJAVA=no)
+enable_static_libjava=
+if test "${ENABLE_STATIC_LIBJAVA}" = "yes" ; then
+  enable_static_libjava=yes
+fi
+
+if test x$enable_static_libjava != xyes ; then
+  EXTRA_CONFIGARGS_LIBJAVA=--disable-static
+fi
+AC_SUBST(EXTRA_CONFIGARGS_LIBJAVA)
+
 # Enable libgomp by default on hosted POSIX systems, and a few others.
 if test x$enable_libgomp = x ; then
     case "${target}" in
@@ -695,96 +736,6 @@ case "${target}" in
   mmix-*-*)
     # See <http://gcc.gnu.org/ml/gcc-patches/2004-11/msg00572.html>.
     unsupported_languages="$unsupported_languages fortran"
-    ;;
-esac
-
-# Disable libffi for some systems.
-case "${target}" in
-  powerpc-*-darwin*)
-    ;;
-  i[[3456789]]86-*-darwin*)
-    ;;
-  x86_64-*-darwin[[912]]*)
-    ;;
-  *-*-darwin*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-netware*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-phoenix*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-rtems*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-tpf*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-uclinux*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-vxworks*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  aarch64*-*-freebsd*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  alpha*-*-*vms*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  arm*-*-freebsd*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  arm-wince-pe)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  arm*-*-symbianelf*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  cris-*-* | crisv32-*-*)
-    case "${target}" in
-      *-*-linux*)
-	;;
-      *) # See PR46792 regarding target-libffi.
-	noconfigdirs="$noconfigdirs target-libffi";;
-    esac
-    ;;
-  hppa*64*-*-hpux*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  hppa*-hp-hpux11*)
-    ;;
-  hppa*-*-hpux*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  ia64*-*-*vms*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  i[[3456789]]86-w64-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  i[[3456789]]86-*-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  x86_64-*-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  mmix-*-*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  powerpc-*-aix*)
-    # copied from rs6000-*-* entry
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  rs6000-*-aix*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  ft32-*-*)
-    noconfigdirs="$noconfigdirs target-libffi"
-    ;;
-  *-*-lynxos*)
-    noconfigdirs="$noconfigdirs target-libffi"
     ;;
 esac
 
@@ -2075,8 +2026,10 @@ case ,${enable_languages},:${enable_objc_gc} in
     # Keep target-boehm-gc if requested for Objective-C.
     ;;
   *)
-    # Otherwise remove target-boehm-gc.
-    noconfigdirs="$noconfigdirs target-boehm-gc"
+    # Otherwise remove target-boehm-gc depending on target-libjava.
+    if echo " ${noconfigdirs} " | grep "target-libjava" >/dev/null 2>&1; then
+      noconfigdirs="$noconfigdirs target-boehm-gc"
+    fi
     ;;
 esac
 
@@ -2163,6 +2116,15 @@ for i in ${target_configdirs_all} ; do
     target_configdirs="${target_configdirs} $i"
   fi
 done
+
+# Exclude target-zlib if target-libjava isn't built.
+case ${target_configdirs} in
+*target-libjava*)
+  ;;
+*)
+  target_configdirs="`echo ${target_configdirs} | sed -e 's/target-zlib//'`"
+  ;;
+esac
 
 # libiberty-linker-plugin is special: it doesn't have its own source directory,
 # so we have to add it after the preceding checks.
@@ -3325,6 +3287,8 @@ GCC_TARGET_TOOL(c++ for libstdc++, RAW_CXX_FOR_TARGET, CXX,
 		c++)
 GCC_TARGET_TOOL(dlltool, DLLTOOL_FOR_TARGET, DLLTOOL, [binutils/dlltool])
 GCC_TARGET_TOOL(gcc, GCC_FOR_TARGET, , [gcc/xgcc -B$$r/$(HOST_SUBDIR)/gcc/])
+GCC_TARGET_TOOL(gcj, GCJ_FOR_TARGET, GCJ,
+		[gcc/gcj -B$$r/$(HOST_SUBDIR)/gcc/], java)
 GCC_TARGET_TOOL(gfortran, GFORTRAN_FOR_TARGET, GFORTRAN,
 		[gcc/gfortran -B$$r/$(HOST_SUBDIR)/gcc/], fortran)
 GCC_TARGET_TOOL(gccgo, GOC_FOR_TARGET, GOC,
