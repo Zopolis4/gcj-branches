@@ -105,6 +105,15 @@ operator == (const cp_expr &lhs, tree rhs)
 
 enum cp_tree_index
 {
+    CPTI_JAVA_BYTE_TYPE,
+    CPTI_JAVA_SHORT_TYPE,
+    CPTI_JAVA_INT_TYPE,
+    CPTI_JAVA_LONG_TYPE,
+    CPTI_JAVA_FLOAT_TYPE,
+    CPTI_JAVA_DOUBLE_TYPE,
+    CPTI_JAVA_CHAR_TYPE,
+    CPTI_JAVA_BOOLEAN_TYPE,
+
     CPTI_WCHAR_DECL,
     CPTI_VTABLE_ENTRY_TYPE,
     CPTI_DELTA_TYPE,
@@ -148,11 +157,13 @@ enum cp_tree_index
 
     CPTI_LANG_NAME_C,
     CPTI_LANG_NAME_CPLUSPLUS,
+    CPTI_LANG_NAME_JAVA,
 
     CPTI_EMPTY_EXCEPT_SPEC,
     CPTI_NOEXCEPT_TRUE_SPEC,
     CPTI_NOEXCEPT_FALSE_SPEC,
     CPTI_NOEXCEPT_DEFERRED_SPEC,
+    CPTI_JCLASS,
 
     CPTI_TERMINATE_FN,
     CPTI_CALL_UNEXPECTED_FN,
@@ -179,6 +190,15 @@ enum cp_tree_index
 };
 
 extern GTY(()) tree cp_global_trees[CPTI_MAX];
+
+#define java_byte_type_node             cp_global_trees[CPTI_JAVA_BYTE_TYPE]
+#define java_short_type_node            cp_global_trees[CPTI_JAVA_SHORT_TYPE]
+#define java_int_type_node              cp_global_trees[CPTI_JAVA_INT_TYPE]
+#define java_long_type_node             cp_global_trees[CPTI_JAVA_LONG_TYPE]
+#define java_float_type_node            cp_global_trees[CPTI_JAVA_FLOAT_TYPE]
+#define java_double_type_node           cp_global_trees[CPTI_JAVA_DOUBLE_TYPE]
+#define java_char_type_node             cp_global_trees[CPTI_JAVA_CHAR_TYPE]
+#define java_boolean_type_node          cp_global_trees[CPTI_JAVA_BOOLEAN_TYPE]
 
 #define wchar_decl_node			cp_global_trees[CPTI_WCHAR_DECL]
 #define vtable_entry_type		cp_global_trees[CPTI_VTABLE_ENTRY_TYPE]
@@ -269,6 +289,7 @@ extern GTY(()) tree cp_global_trees[CPTI_MAX];
 #define init_list_identifier		cp_global_trees[CPTI_INIT_LIST_IDENTIFIER]
 #define lang_name_c			cp_global_trees[CPTI_LANG_NAME_C]
 #define lang_name_cplusplus		cp_global_trees[CPTI_LANG_NAME_CPLUSPLUS]
+#define lang_name_java                  cp_global_trees[CPTI_LANG_NAME_JAVA]
 
 /* Exception specifiers used for throw(), noexcept(true),
    noexcept(false) and deferred noexcept.  We rely on these being
@@ -277,6 +298,9 @@ extern GTY(()) tree cp_global_trees[CPTI_MAX];
 #define noexcept_true_spec		cp_global_trees[CPTI_NOEXCEPT_TRUE_SPEC]
 #define noexcept_false_spec		cp_global_trees[CPTI_NOEXCEPT_FALSE_SPEC]
 #define noexcept_deferred_spec		cp_global_trees[CPTI_NOEXCEPT_DEFERRED_SPEC]
+
+/* If non-NULL, a POINTER_TYPE equivalent to (java::lang::Class*).  */
+#define jclass_node                     cp_global_trees[CPTI_JCLASS]
 
 /* Exception handling function declarations.  */
 #define terminate_fn			cp_global_trees[CPTI_TERMINATE_FN]
@@ -423,6 +447,7 @@ extern GTY(()) tree cp_global_trees[CPTI_MAX];
    1: TYPE_HAS_USER_CONSTRUCTOR.
    2: TYPE_HAS_LATE_RETURN_TYPE (in FUNCTION_TYPE, METHOD_TYPE)
       TYPE_PTRMEMFUNC_FLAG (in RECORD_TYPE)
+   3: TYPE_FOR_JAVA.
    4: TYPE_HAS_NONTRIVIAL_DESTRUCTOR
    5: CLASS_TYPE_P (in RECORD_TYPE and UNION_TYPE)
       ENUM_FIXED_UNDERLYING_TYPE_P (in ENUMERAL_TYPE)
@@ -1800,7 +1825,7 @@ extern bool statement_code_p[MAX_TREE_CODES];
 
 #define STATEMENT_CODE_P(CODE) statement_code_p[(int) (CODE)]
 
-enum languages { lang_c, lang_cplusplus };
+enum languages { lang_c, lang_cplusplus, lang_java };
 
 /* Macros to make error reporting functions' lives easier.  */
 #define TYPE_LINKAGE_IDENTIFIER(NODE) \
@@ -1849,6 +1874,9 @@ enum languages { lang_c, lang_cplusplus };
   ((T) == RECORD_TYPE || (T) == UNION_TYPE)
 #define OVERLOAD_TYPE_P(T) \
   (CLASS_TYPE_P (T) || TREE_CODE (T) == ENUMERAL_TYPE)
+
+/* True if this a "Java" type, defined in 'extern "Java"'.  */
+#define TYPE_FOR_JAVA(NODE) TYPE_LANG_FLAG_3 (NODE)
 
 /* True if this type is dependent.  This predicate is only valid if
    TYPE_DEPENDENT_P_VALID is true.  */
@@ -1954,9 +1982,9 @@ struct GTY(()) lang_type {
   unsigned diamond_shaped : 1;
   unsigned repeated_base : 1;
   unsigned being_defined : 1;
+  unsigned java_interface : 1;
   unsigned debug_requested : 1;
   unsigned fields_readonly : 1;
-  unsigned ptrmemfunc_flag : 1;
 
   unsigned was_anonymous : 1;
   unsigned lazy_default_ctor : 1;
@@ -1988,7 +2016,7 @@ struct GTY(()) lang_type {
   /* There are some bits left to fill out a 32-bit word.  Keep track
      of this by updating the size of this bitfield whenever you add or
      remove a flag.  */
-  unsigned dummy : 4;
+  unsigned dummy : 3;
 
   tree primary_base;
   vec<tree_pair_s, va_gc> *vcall_indices;
@@ -2207,6 +2235,11 @@ struct GTY(()) lang_type {
 /* The alignment of NODE, without its virtual bases, in bytes.  */
 #define CLASSTYPE_ALIGN_UNIT(NODE) \
   (CLASSTYPE_ALIGN (NODE) / BITS_PER_UNIT)
+
+/* True if this a Java interface type, declared with
+   '__attribute__ ((java_interface))'.  */
+#define TYPE_JAVA_INTERFACE(NODE) \
+  (LANG_TYPE_CLASS_CHECK (NODE)->java_interface)
 
 /* A vec<tree> of virtual functions which cannot be inherited by
    derived classes.  When deriving from this type, the derived
@@ -5844,6 +5877,9 @@ extern cp_parameter_declarator *no_parameters;
 extern int class_dump_id;
 extern int raw_dump_id;
 
+/* True if we saw "#pragma GCC java_exceptions".  */
+extern bool pragma_java_exceptions;
+
 /* in call.c */
 extern bool check_dtor_name			(tree, tree);
 int magic_varargs_p				(tree);
@@ -6160,6 +6196,7 @@ extern tree cxx_maybe_build_cleanup		(tree, tsubst_flags_t);
 /* in decl2.c */
 extern void note_mangling_alias			(tree, tree);
 extern void generate_mangling_aliases		(void);
+extern bool check_java_method			(tree);
 extern tree build_memfn_type			(tree, tree, cp_cv_quals, cp_ref_qualifier);
 extern tree build_pointer_ptrmemfn_type	(tree);
 extern tree change_return_type			(tree, tree);
@@ -6308,6 +6345,7 @@ extern tree build_vec_delete			(tree, tree,
 						 tsubst_flags_t);
 extern tree create_temporary_var		(tree);
 extern void initialize_vtbl_ptrs		(tree);
+extern tree build_java_class_ref		(tree);
 extern tree scalar_constant_value		(tree);
 extern tree decl_really_constant_value		(tree);
 extern int diagnose_uninitialized_cst_or_ref_member (tree, bool, bool);

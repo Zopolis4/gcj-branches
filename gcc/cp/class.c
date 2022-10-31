@@ -1045,6 +1045,16 @@ add_method (tree type, tree method, bool via_using)
   /* Maintain TYPE_HAS_USER_CONSTRUCTOR, etc.  */
   grok_special_member_properties (method);
 
+  if (DECL_MAYBE_IN_CHARGE_DESTRUCTOR_P (method) && (TYPE_FOR_JAVA (type)))
+    {
+      if (!DECL_ARTIFICIAL (method))
+        error ("Java class %qT cannot have a destructor", type);
+      else if (TYPE_HAS_NONTRIVIAL_DESTRUCTOR (type))
+        error ("Java class %qT cannot have an implicit non-trivial "
+               "destructor",
+               type);
+    }
+
   tree m;
 
   insert_p = true;
@@ -1073,7 +1083,12 @@ add_method (tree type, tree method, bool via_using)
 	  && DECL_NAME (m) > DECL_NAME (method))
 	break;
     }
+<<<<<<< HEAD
   current_fns = insert_p ? NULL_TREE : (*method_vec)[slot];
+=======
+
+  gcc_assert (!DECL_EXTERN_C_P (method));
+>>>>>>> ead2b2107b2... Revert "extend.texi (Java Exceptions): Remove."
 
   /* Check to see if we've already got this method.  */
   for (ovl_iterator iter (current_fns); iter; ++iter)
@@ -3368,8 +3383,17 @@ add_implicitly_declared_members (tree t, tree* access_decls,
 {
   /* Destructor.  */
   if (!CLASSTYPE_DESTRUCTOR (t))
-    /* In general, we create destructors lazily.  */
-    CLASSTYPE_LAZY_DESTRUCTOR (t) = 1;
+    {
+      /* In general, we create destructors lazily.  */
+      CLASSTYPE_LAZY_DESTRUCTOR (t) = 1;
+
+      if (TYPE_HAS_NONTRIVIAL_DESTRUCTOR (t)
+          && TYPE_FOR_JAVA (t))
+        /* But if this is a Java class, any non-trivial destructor is
+           invalid, even if compiler-generated.  Therefore, if the
+           destructor is non-trivial we create it now.  */
+        lazily_declare_fn (sfk_destructor, t);
+    }
 
   bool move_ok = false;
   if (cxx_dialect >= cxx11 && CLASSTYPE_LAZY_DESTRUCTOR (t)
@@ -3398,7 +3422,7 @@ add_implicitly_declared_members (tree t, tree* access_decls,
 
      If a class definition does not explicitly declare a copy
      constructor, one is declared implicitly.  */
-  if (! TYPE_HAS_COPY_CTOR (t))
+  if (! TYPE_HAS_COPY_CTOR (t) && ! TYPE_FOR_JAVA (t))
     {
       TYPE_HAS_COPY_CTOR (t) = 1;
       TYPE_HAS_CONST_COPY_CTOR (t) = !cant_have_const_cctor;
@@ -3411,7 +3435,7 @@ add_implicitly_declared_members (tree t, tree* access_decls,
      when it is needed.  For now, just record whether or not the type
      of the parameter to the assignment operator will be a const or
      non-const reference.  */
-  if (!TYPE_HAS_COPY_ASSIGN (t))
+  if (!TYPE_HAS_COPY_ASSIGN (t) && !TYPE_FOR_JAVA (t))
     {
       TYPE_HAS_COPY_ASSIGN (t) = 1;
       TYPE_HAS_CONST_COPY_ASSIGN (t) = !cant_have_const_assignment;
@@ -6636,7 +6660,8 @@ determine_key_method (tree type)
 {
   tree method;
 
-  if (processing_template_decl
+  if (TYPE_FOR_JAVA (type)
+      || processing_template_decl
       || CLASSTYPE_TEMPLATE_INSTANTIATION (type)
       || CLASSTYPE_INTERFACE_KNOWN (type))
     return;
@@ -7230,7 +7255,9 @@ finish_struct_1 (tree t)
   /* Build the VTT for T.  */
   build_vtt (t);
 
-  if (warn_nonvdtor
+  /* This warning does not make sense for Java classes, since they
+     cannot have destructors.  */
+  if (!TYPE_FOR_JAVA (t) && warn_nonvdtor
       && TYPE_POLYMORPHIC_P (t) && accessible_nvdtor_p (t)
       && !CLASSTYPE_FINAL (t))
     warning (OPT_Wnon_virtual_dtor,
@@ -7965,9 +7992,29 @@ push_lang_context (tree name)
   vec_safe_push (current_lang_base, current_lang_name);
 
   if (name == lang_name_cplusplus)
-    current_lang_name = name;
+    {
+      current_lang_name = name;
+    }
+  else if (name == lang_name_java)
+    {
+      current_lang_name = name;
+      /* DECL_IGNORED_P is initially set for these types, to avoid clutter.
+	 (See record_builtin_java_type in decl.c.)  However, that causes
+	 incorrect debug entries if these types are actually used.
+	 So we re-enable debug output after extern "Java".  */
+      DECL_IGNORED_P (TYPE_NAME (java_byte_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_short_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_int_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_long_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_float_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_double_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_char_type_node)) = 0;
+      DECL_IGNORED_P (TYPE_NAME (java_boolean_type_node)) = 0;
+    }
   else if (name == lang_name_c)
-    current_lang_name = name;
+    {
+      current_lang_name = name;
+    }
   else
     error ("language string %<\"%E\"%> not recognized", name);
 }
