@@ -700,6 +700,7 @@ USING_NOGC_FALSE
 USING_NOGC_TRUE
 USING_BOEHMGC_FALSE
 USING_BOEHMGC_TRUE
+GCINCS
 GCLIBS
 LIBGCJTESTSPEC
 LIBMATHSPEC
@@ -13398,7 +13399,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13401 "configure"
+#line 13402 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13504,7 +13505,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13507 "configure"
+#line 13508 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20817,6 +20818,7 @@ else
 $as_echo "#define HAVE_BOEHM_GC 1" >>confdefs.h
 
 fi
+
 
 ac_config_links="$ac_config_links include/java-gc.h:include/$GCHDR"
 
