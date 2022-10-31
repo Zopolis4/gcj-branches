@@ -158,7 +158,6 @@ am__objects_1 = libz_a-adler32.$(OBJEXT) libz_a-compress.$(OBJEXT) \
 	libz_a-inflate.$(OBJEXT) libz_a-inftrees.$(OBJEXT) \
 	libz_a-trees.$(OBJEXT) libz_a-uncompr.$(OBJEXT) \
 	libz_a-zutil.$(OBJEXT)
-@TARGET_LIBRARY_FALSE@am_libz_a_OBJECTS = $(am__objects_1)
 libz_a_OBJECTS = $(am_libz_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libz_convenience_la_LIBADD =
