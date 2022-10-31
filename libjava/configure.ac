@@ -1096,6 +1096,7 @@ else
   AC_DEFINE(HAVE_BOEHM_GC, 1, [Define if Boehm GC in use.])
 fi
 AC_SUBST(GCLIBS)
+AC_SUBST(GCINCS)
 AC_CONFIG_LINKS(include/java-gc.h:include/$GCHDR)
 AM_CONDITIONAL(USING_BOEHMGC, test "$USE_GC" = yes)
 AM_CONDITIONAL(USING_NOGC, test "$USE_GC" = no)
