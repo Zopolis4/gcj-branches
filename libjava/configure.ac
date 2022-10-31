@@ -1587,7 +1587,7 @@ if test ! -f gnu/classpath/Configuration.java; then
   fi
 fi
 
-LT_AC_PROG_GCJ
+LT_PROG_GCJ
 
 # Now remove it.
 rm -f gnu/classpath/Configuration.java
