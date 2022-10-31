@@ -5162,6 +5162,8 @@ free_lang_data_in_type (tree type)
 	  /* C++ FE uses TREE_PURPOSE to store initial values.  */
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MINVAL (type) = NULL;
     }
   if (TREE_CODE (type) == METHOD_TYPE)
     {
@@ -5172,6 +5174,8 @@ free_lang_data_in_type (tree type)
 	  /* C++ FE uses TREE_PURPOSE to store initial values.  */
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MINVAL (type) = NULL;
     }
 
   /* Remove members that are not actually FIELD_DECLs from the field
@@ -5657,7 +5661,16 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	  tree tem;
 	  FOR_EACH_VEC_ELT (*BINFO_BASE_BINFOS (TYPE_BINFO (t)), i, tem)
 	    fld_worklist_push (TREE_TYPE (tem), fld);
-	  fld_worklist_push (BINFO_VIRTUALS (TYPE_BINFO (t)), fld);
+	  tem = BINFO_VIRTUALS (TYPE_BINFO (t));
+	  if (tem
+	      /* The Java FE overloads BINFO_VIRTUALS for its own purpose.  */
+	      && TREE_CODE (tem) == TREE_LIST)
+	    do
+	      {
+		fld_worklist_push (TREE_VALUE (tem), fld);
+		tem = TREE_CHAIN (tem);
+	      }
+	    while (tem);
 	}
       if (RECORD_OR_UNION_TYPE_P (t))
 	{
@@ -10786,7 +10799,7 @@ build_common_builtin_nodes (void)
 			ECF_PURE | ECF_NOTHROW | ECF_LEAF);
 
   /* If there's a possibility that we might use the ARM EABI, build the
-    alternate __cxa_end_cleanup node used to resume from C++.  */
+    alternate __cxa_end_cleanup node used to resume from C++ and Java.  */
   if (targetm.arm_eabi_unwinder)
     {
       ftype = build_function_type_list (void_type_node, NULL_TREE);
@@ -14016,6 +14029,15 @@ verify_type (const_tree t)
 				     TREE_TYPE (TYPE_MIN_VALUE (t))
 	 but does not for C sizetypes in LTO.  */
     }
+  /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
+  else if (TYPE_MINVAL (t)
+	   && ((TREE_CODE (t) != METHOD_TYPE && TREE_CODE (t) != FUNCTION_TYPE)
+	       || in_lto_p))
+    {
+      error ("TYPE_MINVAL non-NULL");
+      debug_tree (TYPE_MINVAL (t));
+      error_found = true;
+    }
 
   /* Check various uses of TYPE_MAXVAL.  */
   if (RECORD_OR_UNION_TYPE_P (t))
@@ -14085,6 +14107,14 @@ verify_type (const_tree t)
 	{
 	  error ("TYPE_BINFO is not TREE_BINFO");
 	  debug_tree (TYPE_BINFO (t));
+	  error_found = true;
+	}
+      /* FIXME: Java builds invalid empty binfos that do not have
+         TREE_TYPE set.  */
+      else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t) && 0)
+	{
+	  error ("TYPE_BINFO type is not TYPE_MAIN_VARIANT");
+	  debug_tree (TREE_TYPE (TYPE_BINFO (t)));
 	  error_found = true;
 	}
     }
@@ -14240,6 +14270,20 @@ verify_type (const_tree t)
     {
       error ("TYPE_STRING_FLAG is set on wrong type code");
       error_found = true;
+    }
+  else if (TYPE_STRING_FLAG (t))
+    {
+      const_tree b = t;
+      if (TREE_CODE (b) == ARRAY_TYPE)
+	b = TREE_TYPE (t);
+      /* Java builds arrays with TYPE_STRING_FLAG of promoted_char_type
+	 that is 32bits.  */
+      if (TREE_CODE (b) != INTEGER_TYPE)
+	{
+	  error ("TYPE_STRING_FLAG is set on type that does not look like "
+		 "char nor array of chars");
+	  error_found = true;
+	}
     }
   
   /* ipa-devirt makes an assumption that TYPE_METHOD_BASETYPE is always
