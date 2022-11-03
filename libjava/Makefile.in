@@ -104,8 +104,7 @@ DIST_COMMON = $(srcdir)/sources.am NEWS README ChangeLog THANKS \
 @XLIB_AWT_TRUE@am__append_29 = $(xlib_nat_headers)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/libltdl/acinclude.m4 \
-	$(top_srcdir)/../config/acx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../config/acx.m4 \
 	$(top_srcdir)/../config/depstand.m4 \
 	$(top_srcdir)/../config/enable.m4 \
 	$(top_srcdir)/../config/gxx-include-dir.m4 \
@@ -127,7 +126,8 @@ am__aclocal_m4_deps = $(top_srcdir)/libltdl/acinclude.m4 \
 	$(top_srcdir)/../ltoptions.m4 $(top_srcdir)/../ltsugar.m4 \
 	$(top_srcdir)/../ltversion.m4 $(top_srcdir)/../lt~obsolete.m4 \
 	$(top_srcdir)/mingwld.m4 $(top_srcdir)/pkg.m4 \
-	$(top_srcdir)/shlibpath.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/shlibpath.m4 $(top_srcdir)/../config/sjlj.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -547,7 +547,7 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	$(RECURSIVE_CLEAN_TARGETS:-recursive=) tags TAGS ctags CTAGS
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = @DIRLTDL@ gcj include classpath testsuite
+DIST_SUBDIRS = gcj include classpath testsuite
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 ANTLR_JAR = @ANTLR_JAR@
@@ -575,7 +575,6 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DIRLTDL = @DIRLTDL@
 DIVIDESPEC = @DIVIDESPEC@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
@@ -590,7 +589,6 @@ EXCEPTIONSPEC = @EXCEPTIONSPEC@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GCC_FOR_ECJX = @GCC_FOR_ECJX@
-GCDEPS = @GCDEPS@
 GCINCS = @GCINCS@
 GCJ = @GCJ@
 GCJDEPMODE = @GCJDEPMODE@
@@ -600,8 +598,6 @@ GCJVERSION = @GCJVERSION@
 GCJ_BIN_DIR = @GCJ_BIN_DIR@
 GCJ_FOR_ECJX = @GCJ_FOR_ECJX@
 GCLIBS = @GCLIBS@
-GCSPEC = @GCSPEC@
-GCTESTSPEC = @GCTESTSPEC@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
@@ -609,7 +605,6 @@ GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
 HASH_SYNC_SPEC = @HASH_SYNC_SPEC@
 IEEESPEC = @IEEESPEC@
-INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -619,7 +614,6 @@ INTERPRETER = @INTERPRETER@
 JAR = @JAR@
 JAVA_HOME = @JAVA_HOME@
 JAVA_VERSION = @JAVA_VERSION@
-JC1GCSPEC = @JC1GCSPEC@
 JRE_BIN_DIR = @JRE_BIN_DIR@
 JRE_DIR = @JRE_DIR@
 JRE_LIB_DIR = @JRE_LIB_DIR@
@@ -661,6 +655,7 @@ LIBSTDCXX_RAW_CXX_LDFLAGS = @LIBSTDCXX_RAW_CXX_LDFLAGS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LTDLINCL = @LTDLINCL@
 LTLIBICONV = @LTLIBICONV@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
@@ -800,11 +795,11 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-ACLOCAL_AMFLAGS = -I . -I .. -I ../config -I libltdl
+ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # May be used by various substitution variables.
 gcc_version := $(shell cat $(top_srcdir)/../gcc/BASE-VER)
-SUBDIRS = $(DIRLTDL) gcj include classpath $(am__append_1)
+SUBDIRS = gcj include classpath $(am__append_1)
 
 # write_entries_to_file - writes each entry in a list
 # to the specified file.  Entries are written in chunks of
@@ -1080,7 +1075,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 	-I$(top_srcdir)/classpath/include \
 	-Iclasspath/include \
 	-I$(top_srcdir)/classpath/native/fdlibm \
-	$(GCINCS) $(THREADINCS) $(INCLTDL) \
+	$(GCINCS) $(THREADINCS) $(LTDLINCL) \
 	$(LIBGCC_UNWIND_INCLUDE) $(ZINCS) $(LIBFFIINCS)
 
 BOOTCLASSPATH = $(srcdir)/classpath/lib
