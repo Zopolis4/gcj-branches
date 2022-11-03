@@ -1045,7 +1045,6 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
-m4_include([libltdl/acinclude.m4])
 m4_include([../config/acx.m4])
 m4_include([../config/depstand.m4])
 m4_include([../config/enable.m4])
