@@ -113,6 +113,7 @@ am__objects_1 = libz_a-adler32.$(OBJEXT) libz_a-compress.$(OBJEXT) \
 	libz_a-inflate.$(OBJEXT) libz_a-inftrees.$(OBJEXT) \
 	libz_a-trees.$(OBJEXT) libz_a-uncompr.$(OBJEXT) \
 	libz_a-zutil.$(OBJEXT)
+am_libz_a_OBJECTS = $(am__objects_1)
 libz_a_OBJECTS = $(am_libz_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libzgcj_convenience_la_LIBADD =
@@ -281,6 +282,9 @@ zconf.h.in zlib.h zutil.c zutil.h
 
 noinst_LTLIBRARIES = libzgcj_convenience.la
 libzgcj_convenience_la_SOURCES = $(ZLIB_SOURCES)
+toolexeclib_LIBRARIES = libz.a
+libz_a_SOURCES = $(ZLIB_SOURCES)
+libz_a_CFLAGS = $(AM_CFLAGS) $(PICFLAG)
 
 # Work around what appears to be a GNU make bug handling MAKEFLAGS
 # values defined in terms of make variables, as is the case for CC and
