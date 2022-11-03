@@ -113,16 +113,17 @@ am__objects_1 = libz_a-adler32.$(OBJEXT) libz_a-compress.$(OBJEXT) \
 	libz_a-inflate.$(OBJEXT) libz_a-inftrees.$(OBJEXT) \
 	libz_a-trees.$(OBJEXT) libz_a-uncompr.$(OBJEXT) \
 	libz_a-zutil.$(OBJEXT)
+@TARGET_LIBRARY_FALSE@am_libz_a_OBJECTS = $(am__objects_1)
 libz_a_OBJECTS = $(am_libz_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libzgcj_convenience_la_LIBADD =
 am__objects_2 = adler32.lo compress.lo crc32.lo deflate.lo gzread.lo \
 	gzclose.lo gzwrite.lo gzlib.lo infback.lo inffast.lo \
 	inflate.lo inftrees.lo trees.lo uncompr.lo zutil.lo
-am_libzgcj_convenience_la_OBJECTS =  \
-	$(am__objects_2)
+@TARGET_LIBRARY_TRUE@am_libzgcj_convenience_la_OBJECTS =  \
+@TARGET_LIBRARY_TRUE@	$(am__objects_2)
 libzgcj_convenience_la_OBJECTS = $(am_libzgcj_convenience_la_OBJECTS)
-am_libzgcj_convenience_la_rpath =
+@TARGET_LIBRARY_TRUE@am_libzgcj_convenience_la_rpath =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
@@ -279,8 +280,11 @@ infback.c inffast.c inffast.h inffixed.h inflate.c \
 inflate.h inftrees.c inftrees.h trees.c trees.h uncompr.c zconf.h \
 zconf.h.in zlib.h zutil.c zutil.h
 
-noinst_LTLIBRARIES = libzgcj_convenience.la
-libzgcj_convenience_la_SOURCES = $(ZLIB_SOURCES)
+@TARGET_LIBRARY_TRUE@noinst_LTLIBRARIES = libzgcj_convenience.la
+@TARGET_LIBRARY_TRUE@libzgcj_convenience_la_SOURCES = $(ZLIB_SOURCES)
+@TARGET_LIBRARY_FALSE@toolexeclib_LIBRARIES = libz.a
+@TARGET_LIBRARY_FALSE@libz_a_SOURCES = $(ZLIB_SOURCES)
+@TARGET_LIBRARY_FALSE@libz_a_CFLAGS = $(AM_CFLAGS) $(PICFLAG)
 
 # Work around what appears to be a GNU make bug handling MAKEFLAGS
 # values defined in terms of make variables, as is the case for CC and

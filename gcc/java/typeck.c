@@ -641,9 +641,12 @@ shallow_find_method (tree searched_class, int flags, tree method_name,
 	     tree signature, tree (*signature_builder) (tree))
 {
   tree method;
-  for (method = TYPE_METHODS (searched_class);
+  for (method = TYPE_FIELDS (searched_class);
        method != NULL_TREE;  method = DECL_CHAIN (method))
     {
+      if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+        continue;
+
       tree method_sig = (*signature_builder) (TREE_TYPE (method));
       if (DECL_NAME (method) == method_name && method_sig == signature)
 	{
@@ -776,9 +779,12 @@ lookup_do (tree searched_class, int flags, tree method_name,
 tree
 lookup_java_constructor (tree clas, tree method_signature)
 {
-  tree method = TYPE_METHODS (clas);
+  tree method = TYPE_FIELDS (clas);
   for ( ; method != NULL_TREE;  method = DECL_CHAIN (method))
     {
+      if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+        continue;
+
       tree method_sig = build_java_signature (TREE_TYPE (method));
       if (DECL_CONSTRUCTOR_P (method) && method_sig == method_signature)
 	return method;

@@ -67,6 +67,9 @@ mark_reference_fields (tree field,
       HOST_WIDE_INT offset;
       HOST_WIDE_INT size_bytes;
 
+      if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+        continue;
+
       if (FIELD_STATIC (field))
 	continue;
 

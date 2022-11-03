@@ -1655,8 +1655,14 @@ lookup_field (tree *typep, tree name)
       int i;
 
       for (field = TYPE_FIELDS (*typep); field; field = DECL_CHAIN (field))
-	if (DECL_NAME (field) == name)
-	  return field;
+        {
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
+          if (DECL_NAME (field) == name)
+            return field;
+        }
+
 
       /* Process implemented interfaces. */
       save_field = NULL_TREE;
@@ -2254,9 +2260,12 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       ref = build3 (COMPONENT_REF, method_ptr_type_node, ref,
 		    lookup_field (&class_type_node, methods_ident),
 		    NULL_TREE);
-      for (meth = TYPE_METHODS (self_type);
+      for (meth = TYPE_FIELDS (self_type);
 	   ; meth = DECL_CHAIN (meth))
 	{
+	  if ((TREE_CODE (meth) == FIELD_DECL) || (TREE_CODE (meth) == VAR_DECL) || (TREE_CODE (meth) == PARM_DECL))
+	    continue;
+
 	  if (method == meth)
 	    break;
 	  if (meth == NULL_TREE)

@@ -796,7 +796,13 @@ java_init_decl_processing (void)
     PUSH_FIELD (input_location, object_type_node, field, "sync_info",
 		build_pointer_type (object_type_node));
   for (t = TYPE_FIELDS (object_type_node); t != NULL_TREE; t = DECL_CHAIN (t))
-    FIELD_PRIVATE (t) = 1;
+    {
+      if ((TREE_CODE (t) != FIELD_DECL) || (TREE_CODE (t) != VAR_DECL) || (TREE_CODE (t) != PARM_DECL))
+        continue;
+
+      FIELD_PRIVATE (t) = 1;
+    }
+
   FINISH_RECORD (object_type_node);
 
   field_type_node = make_node (RECORD_TYPE);
@@ -878,7 +884,12 @@ java_init_decl_processing (void)
   PUSH_FIELD (input_location,
 	      class_type_node, field, "reflection_data", ptr_type_node);
   for (t = TYPE_FIELDS (class_type_node);  t != NULL_TREE;  t = DECL_CHAIN (t))
-    FIELD_PRIVATE (t) = 1;
+    {
+      if ((TREE_CODE (t) != FIELD_DECL) || (TREE_CODE (t) != VAR_DECL) || (TREE_CODE (t) != PARM_DECL))
+        continue;
+
+      FIELD_PRIVATE (t) = 1;
+    }
   push_super_field (class_type_node, object_type_node);
 
   FINISH_RECORD (class_type_node);
@@ -1940,12 +1951,13 @@ java_mark_class_local (tree klass)
 {
   tree t;
 
+  //oooooooooh ok so since type_fields got changed to also include function_decl and template_decl it breaks this
   for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
-    if (FIELD_STATIC (t))
+    if (((TREE_CODE (t) == FIELD_DECL) || (TREE_CODE (t) == VAR_DECL) || (TREE_CODE (t) == PARM_DECL)) && FIELD_STATIC (t))
       java_mark_decl_local (t);
 
-  for (t = TYPE_METHODS (klass); t ; t = DECL_CHAIN (t))
-    if (!METHOD_ABSTRACT (t))
+  for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t)) //nn
+    if ((TREE_CODE (t) == FUNCTION_DECL) && !METHOD_ABSTRACT (t))
       {
 	if (METHOD_NATIVE (t) && !flag_jni)
 	  java_mark_cni_decl_local (t);

@@ -769,8 +769,8 @@ add_method_1 (tree this_class, int access_flags, tree name, tree function_type)
     DECL_FUNCTION_INITIALIZED_CLASS_TABLE (fndecl) =
       hash_table<ict_hasher>::create_ggc (50);
 
-  DECL_CHAIN (fndecl) = TYPE_METHODS (this_class);
-  TYPE_METHODS (this_class) = fndecl;
+  DECL_CHAIN (fndecl) = TYPE_FIELDS (this_class);
+  TYPE_FIELDS (this_class) = fndecl;
 
   if (!(access_flags & ACC_STATIC))
     SET_DECL_ALIGN (fndecl, MINIMUM_METHOD_BOUNDARY);
@@ -1574,9 +1574,12 @@ get_dispatch_vector (tree type)
 	    TREE_VEC_ELT (vtable, i) = TREE_VEC_ELT (super_vtable, i);
 	}
 
-      for (method = TYPE_METHODS (type);  method != NULL_TREE;
+      for (method = TYPE_FIELDS (type);  method != NULL_TREE; //nn
 	   method = DECL_CHAIN (method))
 	{
+          if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+            continue;
+
 	  tree method_index = get_method_index (method);
 	  if (method_index != NULL_TREE
 	      && tree_fits_shwi_p (method_index))
@@ -1828,6 +1831,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  if (FIELD_STATIC (field))
 	    static_field_count++;
 	  else if (uses_jv_markobj || !flag_reduced_reflection)
@@ -1857,6 +1863,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  field_index = 0;
 	  if (FIELD_STATIC (field))
 	    field_index = static_count++;
@@ -1874,6 +1883,9 @@ make_class_data (tree type)
     {
       if (! DECL_ARTIFICIAL (field))
 	{
+          if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+            continue;
+
 	  if (FIELD_STATIC (field))
 	    {
               /* We must always create reflection data for static fields
@@ -1918,10 +1930,14 @@ make_class_data (tree type)
     fields_decl = NULL_TREE;
 
   /* Build Method array. */
-  for (method = TYPE_METHODS (type);
+  for (method = TYPE_FIELDS (type); //nn
        method != NULL_TREE; method = DECL_CHAIN (method))
     {
       tree init;
+
+      if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+        continue;
+
       if (METHOD_PRIVATE (method)
 	  && ! flag_keep_inline_functions
 	  && optimize)
@@ -2073,6 +2089,7 @@ make_class_data (tree type)
     PUSH_FIELD_VALUE (v1, "sync_info", null_pointer_node);
   FINISH_RECORD_CONSTRUCTOR (temp, v1, object_type_node);
   START_RECORD_CONSTRUCTOR (v2, class_type_node);
+  //if ((TREE_CODE (TYPE_FIELDS (temp)) != FUNCTION_DECL) || (TREE_CODE (TYPE_FIELDS (temp)) != TEMPLATE_DECL))
   PUSH_SUPER_VALUE (v2, temp);
   PUSH_FIELD_VALUE (v2, "next_or_version", gcj_abi_version);
   PUSH_FIELD_VALUE (v2, "name", build_utf8_ref (DECL_NAME (type_decl)));
@@ -2525,7 +2542,7 @@ add_miranda_methods (tree base_class, tree search_class)
       /* All base classes will have been laid out at this point, so the order 
          will be correct.  This code must match similar layout code in the 
          runtime.  */
-      for (method_decl = TYPE_METHODS (elt);
+      for (method_decl = TYPE_FIELDS (elt);
 	   method_decl; method_decl = DECL_CHAIN (method_decl))
 	{
 	  tree sig, override;
@@ -2534,7 +2551,10 @@ add_miranda_methods (tree base_class, tree search_class)
 	  if (ID_CLINIT_P (DECL_NAME (method_decl)))
 	    continue;
 
-	  sig = build_java_argument_signature (TREE_TYPE (method_decl));
+          if ((TREE_CODE (method_decl) == FIELD_DECL) || (TREE_CODE (method_decl) == VAR_DECL) || (TREE_CODE (method_decl) == PARM_DECL))
+            continue;
+
+          sig = build_java_argument_signature (TREE_TYPE (method_decl));
 	  override = lookup_argument_method (base_class,
 					     DECL_NAME (method_decl), sig);
 	  if (override == NULL_TREE)
@@ -2587,12 +2607,17 @@ layout_class_methods (tree this_class)
       add_miranda_methods (this_class, this_class);
     }
 
-  TYPE_METHODS (this_class) = nreverse (TYPE_METHODS (this_class));
+  TYPE_FIELDS (this_class) = nreverse (TYPE_FIELDS (this_class));
 
-  for (method_decl = TYPE_METHODS (this_class);
+  for (method_decl = TYPE_FIELDS (this_class);
        method_decl; method_decl = DECL_CHAIN (method_decl))
-    dtable_count = layout_class_method (this_class, super_class,
-					method_decl, dtable_count);
+    {
+      if ((TREE_CODE (method_decl) == FIELD_DECL) || (TREE_CODE (method_decl) == VAR_DECL) || (TREE_CODE (method_decl) == PARM_DECL))
+        continue;
+
+      dtable_count = layout_class_method (this_class, super_class,
+					  method_decl, dtable_count);
+    }
 
   TYPE_NVIRTUALS (this_class) = dtable_count;
 }
@@ -2605,8 +2630,11 @@ get_interface_method_index (tree method, tree interface)
   tree meth;
   int i = 1;
 
-  for (meth = TYPE_METHODS (interface); ; meth = DECL_CHAIN (meth))
+  for (meth = TYPE_FIELDS (interface); ; meth = DECL_CHAIN (meth))
     {
+      if ((TREE_CODE (meth) == FIELD_DECL) || (TREE_CODE (meth) == VAR_DECL) || (TREE_CODE (meth) == PARM_DECL))
+        continue;
+
       if (meth == method)
 	return i;
       /* We don't want to put <clinit> into the interface table.  */

@@ -8719,8 +8719,11 @@ build_java_interface_fn_ref (tree fn, tree instance)
 
   /* Determine the itable index of FN.  */
   i = 1;
-  for (method = TYPE_METHODS (iface); method; method = DECL_CHAIN (method))
+  for (method = TYPE_FIELDS (iface); method; method = DECL_CHAIN (method))
     {
+      if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+        continue;
+
       if (!DECL_VIRTUAL_P (method))
 	continue;
       if (fn == method)

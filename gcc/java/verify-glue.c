@@ -361,6 +361,8 @@ vfy_class_has_field (vfy_jclass klass, vfy_string name,
   tree field = TYPE_FIELDS (klass);
   while (field != NULL_TREE)
     {
+      if ((TREE_CODE (field) != FIELD_DECL) || (TREE_CODE (field) != VAR_DECL) || (TREE_CODE (field) != PARM_DECL))
+        continue;
       if (DECL_NAME (field) == name
 	  && build_java_signature (TREE_TYPE (field)) == signature)
 	return true;

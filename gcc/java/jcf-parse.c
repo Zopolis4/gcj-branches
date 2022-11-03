@@ -1564,10 +1564,13 @@ parse_class_file (void)
 
   gen_indirect_dispatch_tables (current_class);
 
-  for (method = TYPE_METHODS (current_class);
+  for (method = TYPE_FIELDS (current_class);
        method != NULL_TREE; method = DECL_CHAIN (method))
     {
       JCF *jcf = current_jcf;
+
+      if ((TREE_CODE (method) == FIELD_DECL) || (TREE_CODE (method) == VAR_DECL) || (TREE_CODE (method) == PARM_DECL))
+        continue;
 
       if (METHOD_ABSTRACT (method) || METHOD_DUMMY (method))
 	continue;
