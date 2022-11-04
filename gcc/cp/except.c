@@ -302,7 +302,7 @@ decl_is_java_type (tree decl, int err)
       if (r)
 	{
 	  tree jthrow_node
-	    = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jthrowable"));
+	    = get_global_binding (get_identifier ("jthrowable"));
 
 	  if (jthrow_node == NULL_TREE)
 	    fatal_error
@@ -527,7 +527,7 @@ expand_start_catch_block (tree decl)
 		    fold_build1_loc (input_location,
 				     NEGATE_EXPR, sizetype,
 				     TYPE_SIZE_UNIT (TREE_TYPE (exp))));
-      exp = cp_build_indirect_ref (exp, RO_NULL, tf_warning_or_error);
+      exp = cp_build_fold_indirect_ref (exp);
       initialize_handler_parm (decl, exp);
       return type;
     }
@@ -762,7 +762,7 @@ build_throw (location_t loc, tree exp)
   if (exp && decl_is_java_type (TREE_TYPE (exp), 1))
     {
       tree name = get_identifier ("_Jv_Throw");
-      tree fn = IDENTIFIER_GLOBAL_VALUE (name);
+      tree fn = get_global_binding (name);
       if (!fn)
 	{
 	  /* Declare void _Jv_Throw (void *).  */
