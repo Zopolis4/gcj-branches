@@ -5654,8 +5654,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
           TREE_VALUE (p) = fld_simplified_type (TREE_VALUE (p), fld);
           TREE_PURPOSE (p) = NULL;
         }
-      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
-      TYPE_MINVAL (type) = NULL;
+      /* Java uses TYPE_MIN_VALUE_RAW for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE_RAW (type) = NULL;
      }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {
