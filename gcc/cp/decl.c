@@ -7870,7 +7870,7 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
 	  if (TYPE_FOR_JAVA (type) && MAYBE_CLASS_TYPE_P (type))
 	    {
 	      tree jclass
-		= IDENTIFIER_GLOBAL_VALUE (get_identifier ("jclass"));
+		= get_global_binding (get_identifier ("jclass"));
 	      /* Allow libjava/prims.cc define primitive classes.  */
 	      if (init != NULL_TREE
 		  || jclass == NULL_TREE
