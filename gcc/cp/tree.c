@@ -4887,7 +4887,7 @@ const struct attribute_spec cxx_attribute_table[] =
 {
   /* { name, min_len, max_len, decl_req, type_req, fn_type_req,
        affects_type_identity, handler, exclude } */
-  { "java_interface", 0, 0, false, false, false, false
+  { "java_interface", 0, 0, false, false, false, false,
     handle_java_interface_attribute, NULL },
   { "init_priority",  1, 1, true,  false, false, false,
     handle_init_priority_attribute, NULL },
