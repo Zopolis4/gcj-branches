@@ -5226,7 +5226,7 @@ check_user_alignment (const_tree align, bool objfile, bool warn_zero)
   if (TREE_CODE (align) != INTEGER_CST
       || !INTEGRAL_TYPE_P (TREE_TYPE (align)))
     {
-      error ("requested alignment is not an integer constant");
+      // error ("requested alignment is not an integer constant");
       return -1;
     }
 
