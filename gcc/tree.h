@@ -2135,6 +2135,8 @@ extern machine_mode element_mode (const_tree t);
    for itself.  */
 #define TYPE_BINFO(NODE) (RECORD_OR_UNION_CHECK (NODE)->type_non_common.maxval)
 
+#define TYPE_BINFO_JAVA(NODE) (RECORD_OR_UNION_CHECK (NODE)->type_non_common.lang_1)
+
 /* For types, used in a language-dependent way.  */
 #define TYPE_LANG_SLOT_1(NODE) \
   (TYPE_CHECK (NODE)->type_non_common.lang_1)

@@ -557,7 +557,7 @@ can_widen_reference_to (tree source_type, tree target_type)
 	      tree binfo, base_binfo;
 	      int i;
 
-	      for (binfo = TYPE_BINFO (source_type), i = 0;
+	      for (binfo = TYPE_BINFO_JAVA (source_type), i = 0;
 		   BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
 	        if (can_widen_reference_to
 		    (BINFO_TYPE (base_binfo), target_type))
@@ -570,7 +570,7 @@ can_widen_reference_to (tree source_type, tree target_type)
 	  for ( ; source_depth > target_depth;  source_depth--) 
 	    {
 	      source_type
-		= BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO (source_type), 0));
+		= BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO_JAVA (source_type), 0));
 	    }
 	  return source_type == target_type;
 	}
@@ -1660,7 +1660,7 @@ lookup_field (tree *typep, tree name)
 
       /* Process implemented interfaces. */
       save_field = NULL_TREE;
-      for (binfo = TYPE_BINFO (*typep), i = 0;
+      for (binfo = TYPE_BINFO_JAVA (*typep), i = 0;
 	   BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
 	{
 	  tree t = BINFO_TYPE (base_binfo);

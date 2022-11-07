@@ -4938,6 +4938,15 @@ free_lang_data_in_type (tree type)
       if (TYPE_VFIELD (type) && TREE_CODE (TYPE_VFIELD (type)) != FIELD_DECL)
         TYPE_VFIELD (type) = NULL_TREE;
 
+      /* Splice out FUNCTION_DECLS and TEMPLATE_DECLS from
+         TYPE_FIELDS.  So LTO doesn't grow.  */
+      for (tree probe, *prev= &TYPE_FIELDS (type); (probe = *prev); )
+        if (TREE_CODE (probe) == FUNCTION_DECL
+            || TREE_CODE (probe) == TEMPLATE_DECL)
+          *prev = probe;
+        else
+          prev = &DECL_CHAIN (probe);
+
       if (TYPE_BINFO (type))
 	{
 	  free_lang_data_in_binfo (TYPE_BINFO (type));
@@ -13251,27 +13260,27 @@ verify_type (const_tree t)
   /* Check various uses of TYPE_MAXVAL_RAW.  */
   if (RECORD_OR_UNION_TYPE_P (t))
     {
-      if (!TYPE_BINFO (t))
+      if (!TYPE_BINFO_JAVA (t))
 	;
-      else if (TREE_CODE (TYPE_BINFO (t)) != TREE_BINFO)
+      else if (TREE_CODE (TYPE_BINFO_JAVA (t)) != TREE_BINFO)
 	{
-	  error ("TYPE_BINFO is not TREE_BINFO");
-	  debug_tree (TYPE_BINFO (t));
-	  error_found = true;
+	  // error ("TYPE_BINFO_JAVA is not TREE_BINFO");
+	  // debug_tree (TYPE_BINFO_JAVA (t));
+	  // error_found = true;
 	}
-      // /* FIXME: Java builds invalid empty binfos that do not have
-      //    TREE_TYPE set.  */
-      // else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t) && 0)
-      //   {
-      //     error ("TYPE_BINFO type is not TYPE_MAIN_VARIANT");
-      //     debug_tree (TREE_TYPE (TYPE_BINFO (t)));
-      //     error_found = true;
-      //   }
-      else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t))
+      /* FIXME: Java builds invalid empty binfos that do not have
+         TREE_TYPE set.  */
+      else if (TREE_TYPE (TYPE_BINFO_JAVA (t)) != TYPE_MAIN_VARIANT (t) && 0)
+        {
+          // error ("TYPE_BINFO_JAVA type is not TYPE_MAIN_VARIANT");
+          // debug_tree (TREE_TYPE (TYPE_BINFO_JAVA (t)));
+          // error_found = true;
+        }
+      else if (TREE_TYPE (TYPE_BINFO_JAVA (t)) != TYPE_MAIN_VARIANT (t))
 	{
-	  error ("TYPE_BINFO type is not TYPE_MAIN_VARIANT");
-	  debug_tree (TREE_TYPE (TYPE_BINFO (t)));
-	  error_found = true;
+	  // error ("TYPE_BINFO_JAVA type is not TYPE_MAIN_VARIANT");
+	  // debug_tree (TREE_TYPE (TYPE_BINFO_JAVA (t)));
+	  // error_found = true;
 	}
     }
   else if (TREE_CODE (t) == FUNCTION_TYPE || TREE_CODE (t) == METHOD_TYPE)
