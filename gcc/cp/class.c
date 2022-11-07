@@ -1083,12 +1083,7 @@ add_method (tree type, tree method, bool via_using)
 	  && DECL_NAME (m) > DECL_NAME (method))
 	break;
     }
-<<<<<<< HEAD
   current_fns = insert_p ? NULL_TREE : (*method_vec)[slot];
-=======
-
-  gcc_assert (!DECL_EXTERN_C_P (method));
->>>>>>> ead2b2107b2... Revert "extend.texi (Java Exceptions): Remove."
 
   /* Check to see if we've already got this method.  */
   for (ovl_iterator iter (current_fns); iter; ++iter)
