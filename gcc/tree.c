@@ -4922,8 +4922,8 @@ free_lang_data_in_type (tree type)
           /* C++ FE uses TREE_PURPOSE to store initial values.  */
           TREE_PURPOSE (p) = NULL;
         }
-      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
-      TYPE_MINVAL (type) = NULL;
+      /* Java uses TYPE_MIN_VALUE_RAW for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE_RAW (type) = NULL;
     }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {
