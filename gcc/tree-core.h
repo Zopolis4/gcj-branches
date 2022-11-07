@@ -1658,6 +1658,7 @@ struct GTY(()) tree_type_non_common {
   tree values;
   tree minval;
   tree maxval;
+  tree binfo;
   tree lang_1;
 };
 
