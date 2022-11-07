@@ -369,7 +369,7 @@ make_class (void)
   type = make_node (RECORD_TYPE);
   /* Unfortunately we must create the binfo here, so that class
      loading works.  */
-  TYPE_BINFO_JAVA (type) = make_tree_binfo (0);
+  TYPE_BINFO (type) = make_tree_binfo (0);
   MAYBE_CREATE_TYPE_TYPE_LANG_SPECIFIC (type);
   TYPE_CATCH_CLASSES (type) = NULL;
   /* Push a dummy entry; we can't call make_catch_class_record here
@@ -524,15 +524,15 @@ set_super_info (int access_flags, tree this_class,
     total_supers++;
 
   if (total_supers)
-    TYPE_BINFO_JAVA (this_class) = make_tree_binfo (total_supers);
+    TYPE_BINFO (this_class) = make_tree_binfo (total_supers);
   TYPE_VFIELD (this_class) = TYPE_VFIELD (object_type_node);
   if (super_class)
     {
       tree super_binfo = make_tree_binfo (0);
       BINFO_TYPE (super_binfo) = super_class;
       BINFO_OFFSET (super_binfo) = integer_zero_node;
-      BINFO_BASE_APPEND (TYPE_BINFO_JAVA (this_class), super_binfo);
-      CLASS_HAS_SUPER_FLAG (TYPE_BINFO_JAVA (this_class)) = 1;
+      BINFO_BASE_APPEND (TYPE_BINFO (this_class), super_binfo);
+      CLASS_HAS_SUPER_FLAG (TYPE_BINFO (this_class)) = 1;
     }
 
   set_class_decl_access_flags (access_flags, class_decl);
@@ -569,7 +569,7 @@ class_depth (tree clas)
   while (clas != object_type_node)
     {
       depth++;
-      clas = BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO_JAVA (clas), 0));
+      clas = BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO (clas), 0));
     }
   return depth;
 }
@@ -582,15 +582,15 @@ interface_of_p (tree type1, tree type2)
   int i;
   tree binfo, base_binfo;
 
-  if (! TYPE_BINFO_JAVA (type2))
+  if (! TYPE_BINFO (type2))
     return 0;
 
-  for (binfo = TYPE_BINFO_JAVA (type2), i = 0;
+  for (binfo = TYPE_BINFO (type2), i = 0;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     if (BINFO_TYPE (base_binfo) == type1)
       return 1;
   
-  for (binfo = TYPE_BINFO_JAVA (type2), i = 0;
+  for (binfo = TYPE_BINFO (type2), i = 0;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++) /*  */
     if (BINFO_TYPE (base_binfo)
 	&& interface_of_p (type1, BINFO_TYPE (base_binfo)))
@@ -696,7 +696,7 @@ maybe_add_interface (tree this_class, tree interface_class)
   tree binfo, base_binfo;
   int i;
 
-  for (binfo = TYPE_BINFO_JAVA (this_class), i = 0;
+  for (binfo = TYPE_BINFO (this_class), i = 0;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     if (BINFO_TYPE (base_binfo) == interface_class)
       return interface_class;
@@ -716,7 +716,7 @@ add_interface (tree this_class, tree interface_class)
   BINFO_VPTR_FIELD (interface_binfo) = integer_zero_node;
   BINFO_VIRTUAL_P (interface_binfo) = 1;
   
-  BINFO_BASE_APPEND (TYPE_BINFO_JAVA (this_class), interface_binfo);
+  BINFO_BASE_APPEND (TYPE_BINFO (this_class), interface_binfo);
 }
 
 static tree
@@ -1998,7 +1998,7 @@ make_class_data (tree type)
 
   /* Build and emit the array of implemented interfaces. */
   if (type != object_type_node)
-    interface_len = BINFO_N_BASE_BINFOS (TYPE_BINFO_JAVA (type)) - 1;
+    interface_len = BINFO_N_BASE_BINFOS (TYPE_BINFO (type)) - 1;
   
   if (interface_len > 0)
     {
@@ -2014,7 +2014,7 @@ make_class_data (tree type)
       
       for (i = 1; i <= interface_len; i++)
 	{
-	  tree child = BINFO_BASE_BINFO (TYPE_BINFO_JAVA (type), i);
+	  tree child = BINFO_BASE_BINFO (TYPE_BINFO (type), i);
 	  tree iclass = BINFO_TYPE (child);
 	  tree index;
 	  if (! flag_indirect_dispatch
@@ -2470,11 +2470,11 @@ layout_class (tree this_class)
   layout_type (this_class);
 
   /* Also recursively load/layout any superinterfaces.  */
-  if (TYPE_BINFO_JAVA (this_class))
+  if (TYPE_BINFO (this_class))
     {
-      for (i = BINFO_N_BASE_BINFOS (TYPE_BINFO_JAVA (this_class)) - 1; i > 0; i--)
+      for (i = BINFO_N_BASE_BINFOS (TYPE_BINFO (this_class)) - 1; i > 0; i--)
 	{
-	  tree binfo = BINFO_BASE_BINFO (TYPE_BINFO_JAVA (this_class), i);
+	  tree binfo = BINFO_BASE_BINFO (TYPE_BINFO (this_class), i);
 	  tree super_interface = BINFO_TYPE (binfo);
 	  tree maybe_super_interface 
 	    = maybe_layout_super_class (super_interface, NULL_TREE);
@@ -2506,7 +2506,7 @@ add_miranda_methods (tree base_class, tree search_class)
   if (!CLASS_PARSED_P (search_class))
     load_class (search_class, 1);
   
-  for (binfo = TYPE_BINFO_JAVA (search_class), i = 1;
+  for (binfo = TYPE_BINFO (search_class), i = 1;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     {
       tree method_decl;

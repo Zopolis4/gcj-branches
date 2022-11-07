@@ -689,7 +689,7 @@ find_method_in_interfaces (tree searched_class, int flags, tree method_name,
   int i;
   tree binfo, base_binfo;
 
-  for (binfo = TYPE_BINFO_JAVA (searched_class), i = 1;
+  for (binfo = TYPE_BINFO (searched_class), i = 1;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     {
       tree iclass = BINFO_TYPE (base_binfo);

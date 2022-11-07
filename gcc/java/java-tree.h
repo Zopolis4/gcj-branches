@@ -74,15 +74,15 @@ struct JCF;
 #define VAR_OR_FIELD_CHECK(DECL) \
   TREE_CHECK3 (DECL, FIELD_DECL, VAR_DECL, PARM_DECL)
 
-/* True if the class whose TYPE_BINFO_JAVA this is has a superclass.
+/* True if the class whose TYPE_BINFO this is has a superclass.
    (True of all classes except Object.) */
 #define CLASS_HAS_SUPER_FLAG(BINFO) BINFO_FLAG_1 (BINFO)
 #define CLASS_HAS_SUPER(TYPE) \
-  (TYPE_BINFO_JAVA (TYPE) && CLASS_HAS_SUPER_FLAG (TYPE_BINFO_JAVA (TYPE)))
+  (TYPE_BINFO (TYPE) && CLASS_HAS_SUPER_FLAG (TYPE_BINFO (TYPE)))
 
 /* Return the supertype of class TYPE, or NULL_TREE is it has none. */
 #define CLASSTYPE_SUPER(TYPE) (CLASS_HAS_SUPER (TYPE) \
-  ? BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO_JAVA (TYPE), 0)) \
+  ? BINFO_TYPE (BINFO_BASE_BINFO (TYPE_BINFO (TYPE), 0)) \
   : NULL_TREE)
 
 /* The class defined by the actual (main) file we are compiling. */
@@ -1267,11 +1267,11 @@ int cxx_keyword_p (const char *name, int length);
 /* The number of virtual methods in this class's dispatch table.
    Does not include initial two dummy entries (one points to the
    Class object, and the other is for G++ -fvtable-thunks compatibility). */
-#define TYPE_NVIRTUALS(TYPE) BINFO_VIRTUALS (TYPE_BINFO_JAVA (TYPE))
+#define TYPE_NVIRTUALS(TYPE) BINFO_VIRTUALS (TYPE_BINFO (TYPE))
 
 /* A TREE_VEC (indexed by DECL_VINDEX) containing this class's
    virtual methods. */
-#define TYPE_VTABLE(TYPE) BINFO_VTABLE(TYPE_BINFO_JAVA (TYPE))
+#define TYPE_VTABLE(TYPE) BINFO_VTABLE(TYPE_BINFO (TYPE))
 
 /* Use CLASS_LOADED_P? FIXME */
 #define CLASS_COMPLETE_P(DECL) DECL_LANG_FLAG_2 (DECL) 

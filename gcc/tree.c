@@ -4910,32 +4910,6 @@ free_lang_data_in_type (tree type)
       /* Java uses TYPE_MIN_VALUE_RAW for TYPE_ARGUMENT_SIGNATURE.  */
       TYPE_MIN_VALUE_RAW (type) = NULL;
     }
-<<<<<<< HEAD
-  else if (TREE_CODE (type) == METHOD_TYPE)
-    {
-      for (tree p = TYPE_ARG_TYPES (type); p; p = TREE_CHAIN (p))
-        {
-          /* C++ FE uses TREE_PURPOSE to store initial values.  */
-          TREE_PURPOSE (p) = NULL;
-        }
-      /* Java uses TYPE_MIN_VALUE_RAW for TYPE_ARGUMENT_SIGNATURE.  */
-      TYPE_MIN_VALUE_RAW (type) = NULL;
-    }
-  else if (RECORD_OR_UNION_TYPE_P (type))
-    {
-      /* Remove members that are not FIELD_DECLs (and maybe
-	 TYPE_DECLs) from the field list of an aggregate.  These occur
-	 in C++.  */
-      for (tree *prev = &TYPE_FIELDS (type), member; (member = *prev);)
-	if (TREE_CODE (member) == FIELD_DECL
-	    || (TREE_CODE (member) == TYPE_DECL
-		&& !DECL_IGNORED_P (member)
-		&& debug_info_level > DINFO_LEVEL_TERSE
-		&& !is_redundant_typedef (member)))
-	  prev = &DECL_CHAIN (member);
-	else
-	  *prev = DECL_CHAIN (member);
-=======
   if (TREE_CODE (type) == METHOD_TYPE)
     {
       tree p;
@@ -4984,7 +4958,6 @@ free_lang_data_in_type (tree type)
 	TREE_CHAIN (prev) = NULL_TREE;
       else
 	TYPE_FIELDS (type) = NULL_TREE;
->>>>>>> parent of 8e093270e1c... tree-core.h (tree_type_non_common): Rename binfo to lang_1.
 
       /* FIXME: C FE uses TYPE_VFIELD to record C_TYPE_INCOMPLETE_VARS
  	 and danagle the pointer from time to time.  */
@@ -4992,7 +4965,6 @@ free_lang_data_in_type (tree type)
         TYPE_VFIELD (type) = NULL_TREE;
 
       /* Splice out FUNCTION_DECLS and TEMPLATE_DECLS from
-<<<<<<< HEAD
          TYPE_FIELDS.  So LTO doesn't grow.  */
       for (tree probe, *prev= &TYPE_FIELDS (type); (probe = *prev); )
         if (TREE_CODE (probe) == FUNCTION_DECL
@@ -5000,15 +4972,6 @@ free_lang_data_in_type (tree type)
           *prev = probe;
         else
           prev = &DECL_CHAIN (probe);
-=======
-	 TYPE_FIELDS.  So LTO doesn't grow.  */
-      for (tree probe, *prev= &TYPE_FIELDS (type); (probe = *prev); )
-	if (TREE_CODE (probe) == FUNCTION_DECL
-	    || TREE_CODE (probe) == TEMPLATE_DECL)
-	  *prev = probe;
-	else
-	  prev = &DECL_CHAIN (probe);
->>>>>>> parent of 8e093270e1c... tree-core.h (tree_type_non_common): Rename binfo to lang_1.
 
       if (TYPE_BINFO (type))
 	{
@@ -13327,31 +13290,6 @@ verify_type (const_tree t)
   /* Check various uses of TYPE_MAXVAL.  */
   if (RECORD_OR_UNION_TYPE_P (t))
     {
-<<<<<<< HEAD
-      if (!TYPE_BINFO_JAVA (t))
-	;
-      else if (TREE_CODE (TYPE_BINFO_JAVA (t)) != TREE_BINFO)
-	{
-	  // error ("TYPE_BINFO_JAVA is not TREE_BINFO");
-	  // debug_tree (TYPE_BINFO_JAVA (t));
-	  // error_found = true;
-	}
-      /* FIXME: Java builds invalid empty binfos that do not have
-         TREE_TYPE set.  */
-      else if (TREE_TYPE (TYPE_BINFO_JAVA (t)) != TYPE_MAIN_VARIANT (t) && 0)
-        {
-          // error ("TYPE_BINFO_JAVA type is not TYPE_MAIN_VARIANT");
-          // debug_tree (TREE_TYPE (TYPE_BINFO_JAVA (t)));
-          // error_found = true;
-        }
-      else if (TREE_TYPE (TYPE_BINFO_JAVA (t)) != TYPE_MAIN_VARIANT (t))
-	{
-	  // error ("TYPE_BINFO_JAVA type is not TYPE_MAIN_VARIANT");
-	  // debug_tree (TREE_TYPE (TYPE_BINFO_JAVA (t)));
-	  // error_found = true;
-	}
-=======
->>>>>>> parent of 8e093270e1c... tree-core.h (tree_type_non_common): Rename binfo to lang_1.
     }
   else if (TREE_CODE (t) == FUNCTION_TYPE || TREE_CODE (t) == METHOD_TYPE)
     {
