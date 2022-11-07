@@ -13590,16 +13590,10 @@ verify_type (const_tree t)
          TREE_TYPE set.  */
       else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t) && 0)
         {
-          error ("TYPE_BINFO type is not TYPE_MAIN_VARIANT");
+          error ("%<TYPE_BINFO%> type is not %<TYPE_MAIN_VARIANT%>");
           debug_tree (TREE_TYPE (TYPE_BINFO (t)));
           error_found = true;
         }
-      else if (TREE_TYPE (TYPE_BINFO (t)) != TYPE_MAIN_VARIANT (t))
-	{
-	  error ("%<TYPE_BINFO%> type is not %<TYPE_MAIN_VARIANT%>");
-	  debug_tree (TREE_TYPE (TYPE_BINFO (t)));
-	  error_found = true;
-	}
     }
   else if (TREE_CODE (t) == FUNCTION_TYPE || TREE_CODE (t) == METHOD_TYPE)
     {
