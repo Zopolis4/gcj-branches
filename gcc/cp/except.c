@@ -281,7 +281,7 @@ decl_is_java_type (tree decl, int err)
       if (r)
 	{
 	  tree jthrow_node
-	    = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jthrowable"));
+	    = get_global_binding (get_identifier ("jthrowable"));
 
 	  if (jthrow_node == NULL_TREE)
 	    fatal_error
@@ -720,7 +720,7 @@ build_throw (tree exp)
   if (exp && decl_is_java_type (TREE_TYPE (exp), 1))
     {
       tree name = get_identifier ("_Jv_Throw");
-      tree fn = IDENTIFIER_GLOBAL_VALUE (name);
+      tree fn = get_global_binding (name);
       if (!fn)
 	{
 	  /* Declare void _Jv_Throw (void *).  */
