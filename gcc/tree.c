@@ -14712,7 +14712,8 @@ verify_type (const_tree t)
       error ("%<TYPE_CACHED_VALUES_P%> is set while it should not be");
       error_found = true;
     }
-  else if (TYPE_STRING_FLAG (t))
+  else if ((TREE_CODE (t) == ARRAY_TYPE || TREE_CODE (t) == INTEGER_TYPE)
+      && TYPE_STRING_FLAG (t))
     {
       const_tree b = t;
       if (TREE_CODE (b) == ARRAY_TYPE)
