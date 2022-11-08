@@ -2305,6 +2305,7 @@ struct GTY(()) lang_type {
   unsigned java_interface : 1;
   unsigned debug_requested : 1;
   unsigned fields_readonly : 1;
+  unsigned ptrmemfunc_flag : 1;
 
   unsigned lazy_default_ctor : 1;
   unsigned lazy_copy_ctor : 1;
@@ -2335,7 +2336,7 @@ struct GTY(()) lang_type {
   /* There are some bits left to fill out a 32-bit word.  Keep track
      of this by updating the size of this bitfield whenever you add or
      remove a flag.  */
-  unsigned dummy : 4;
+  unsigned dummy : 3;
 
   tree primary_base;
   vec<tree_pair_s, va_gc> *vcall_indices;
