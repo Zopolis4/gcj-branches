@@ -3305,6 +3305,12 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
   bool member_new_p = false;
 
+  bool member_delete_p = (!globally_qualified_p
+                          && CLASS_TYPE_P (elt_type)
+                          && (array_p
+                            ? TYPE_GETS_VEC_DELETE (elt_type)
+                            : TYPE_GETS_REG_DELETE (elt_type)));
+
   /* Allocate the object.  */
   if (vec_safe_is_empty (*placement) && TYPE_FOR_JAVA (elt_type))
     {
@@ -3358,12 +3364,6 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
       tree fns;
 
       fnname = ovl_op_identifier (false, array_p ? VEC_NEW_EXPR : NEW_EXPR);
-
-      bool member_delete_p = (!globally_qualified_p
-                              && CLASS_TYPE_P (elt_type)
-                              && (array_p
-                                  ? TYPE_GETS_VEC_DELETE (elt_type)
-                                  : TYPE_GETS_REG_DELETE (elt_type)));
 
       if (member_new_p)
         {
