@@ -340,7 +340,7 @@ _Jv_ThreadRun (java::lang::Thread* thread)
       // this results in an uncaught exception, that is ignored.
       try
 	{
-	  thread->getUncaughtExceptionHandler()->uncaughtException (thread, t);
+	  //thread->getUncaughtExceptionHandler()->uncaughtException (thread, t);
 	}
       catch (java::lang::Throwable *f)
 	{
