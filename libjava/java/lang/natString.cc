@@ -588,12 +588,12 @@ java::lang::String::contentEquals(java::lang::StringBuffer* buffer)
 jboolean
 java::lang::String::contentEquals(java::lang::CharSequence *seq)
 {
-  if (seq->length() != count)
-    return false;
+  // if (seq->length() != count)
+  //   return false;
   jchar *value = JvGetStringChars(this);
-  for (int i = 0; i < count; ++i)
-    if (value[i] != seq->charAt(i))
-      return false;
+  // for (int i = 0; i < count; ++i)
+  //   if (value[i] != seq->charAt(i))
+  //     return false;
   return true;
 }
 
