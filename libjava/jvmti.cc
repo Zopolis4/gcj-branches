@@ -1227,15 +1227,16 @@ _Jv_JVMTI_GetClassLoaderClasses (MAYBE_UNUSED jvmtiEnv *env,
     loader = VMClassLoader::bootLoader;
 
   Collection *values = loader->loadedClasses->values();
-  jobjectArray array = values->toArray();
-  *count_ptr = array->length;
-  jobject *elts = elements (array);
+  //jobjectArray array = values->toArray();
+  //*count_ptr = array->length;
+  //jobject *elts = elements (array);
   jclass *result
     = (jclass *) _Jv_MallocUnchecked (*count_ptr * sizeof (jclass));
   if (result == NULL)
     return JVMTI_ERROR_OUT_OF_MEMORY;
 
   // FIXME: JNI references...
+  jobject *elts;
   memcpy (result, elts, *count_ptr * sizeof (jclass));
 
   *result_ptr = result;
@@ -1358,7 +1359,7 @@ _Jv_JVMTI_DisposeEnvironment (jvmtiEnv *env)
     return JVMTI_ERROR_INVALID_ENVIRONMENT;
   else
     {
-      _envListLock->writeLock ()->lock ();
+      //_envListLock->writeLock ()->lock ();
       if (_jvmtiEnvironments->env == env)
 	{
 	  struct jvmti_env_list *next = _jvmtiEnvironments->next;
@@ -1372,7 +1373,7 @@ _Jv_JVMTI_DisposeEnvironment (jvmtiEnv *env)
 	    e = e->next;
 	  if (e->next == NULL)
 	    {
-	      _envListLock->writeLock ()->unlock ();
+	      //_envListLock->writeLock ()->unlock ();
 	      return JVMTI_ERROR_INVALID_ENVIRONMENT;
 	    }
 
@@ -1380,7 +1381,7 @@ _Jv_JVMTI_DisposeEnvironment (jvmtiEnv *env)
 	  _Jv_Free (e->next);
 	  e->next = next;
 	}
-      _envListLock->writeLock ()->unlock ();
+      //_envListLock->writeLock ()->unlock ();
     }
 
   _Jv_Free (env);
@@ -1683,7 +1684,7 @@ check_enabled_event (jvmtiEvent type)
 
   if (_jvmtiEnvironments != NULL)
     {
-      _envListLock->readLock ()->lock ();
+      //_envListLock->readLock ()->lock ();
       struct jvmti_env_list *e;
       FOREACH_ENVIRONMENT (e)
 	{
@@ -1693,12 +1694,12 @@ check_enabled_event (jvmtiEvent type)
 	  if (e->env->enabled[index] && *callback != NULL)
 	    {
 	      *enabled = true;
-	      _envListLock->readLock ()->unlock ();
+	      //_envListLock->readLock ()->unlock ();
 	      return;
 	    }
 	}
 
-      _envListLock->readLock ()->unlock ();
+      //_envListLock->readLock ()->unlock ();
     }
 
   *enabled = false;
@@ -2217,7 +2218,7 @@ _Jv_GetJVMTIEnv (void)
   element->env = env;
   element->next = NULL;
 
-  _envListLock->writeLock ()->lock ();
+  //_envListLock->writeLock ()->lock ();
   if (_jvmtiEnvironments == NULL)
     _jvmtiEnvironments = element;
   else
@@ -2227,7 +2228,7 @@ _Jv_GetJVMTIEnv (void)
 	;
       e->next = element;
     }
-  _envListLock->writeLock ()->unlock ();
+  //_envListLock->writeLock ()->unlock ();
 
   /* Mark JVMTI active. This is used to force the interpreter
      to use either debugging or non-debugging code. Once JVMTI
@@ -2605,7 +2606,7 @@ _Jv_JVMTI_PostEvent (jvmtiEvent type, jthread event_thread, ...)
   va_list args;
   va_start (args, event_thread);
 
-  _envListLock->readLock ()->lock ();
+  //_envListLock->readLock ()->lock ();
   struct jvmti_env_list *e;
   FOREACH_ENVIRONMENT (e)
     {
@@ -2621,6 +2622,6 @@ _Jv_JVMTI_PostEvent (jvmtiEvent type, jthread event_thread, ...)
 	  post_event (e->env, type, event_thread, args);
 	}
     }
-  _envListLock->readLock ()->unlock ();
+  //_envListLock->readLock ()->unlock ();
   va_end (args);
 }
