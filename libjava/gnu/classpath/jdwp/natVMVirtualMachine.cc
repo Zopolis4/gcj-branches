@@ -376,19 +376,19 @@ gnu::classpath::jdwp::VMVirtualMachine::unregisterEvent (EventRequest *request)
 	// to install a breakpoint
 	JvAssert (the_location != NULL);
 
-	::java::util::Iterator *iter = breakpoints->iterator ();
-	while (iter->hasNext ())
-	  {
-	    EventRequest *er
-	      = reinterpret_cast<EventRequest *> (iter->next ());
-	    Location *loc = get_request_location (er);
-	    JvAssert (loc != NULL);
-	    if (loc->equals (the_location) && ++matches == 2)
-	      {
-		// Short-circuit: already more than one breakpoint
-		return;
-	      }
-	  }
+	::java::util::Iterator *iter;
+	// while (iter->hasNext ())
+	//   {
+	//     EventRequest *er
+	//       = reinterpret_cast<EventRequest *> (iter->next ());
+	//     Location *loc = get_request_location (er);
+	//     JvAssert (loc != NULL);
+	//     if (loc->equals (the_location) && ++matches == 2)
+	//       {
+	// 	// Short-circuit: already more than one breakpoint
+	// 	return;
+	//       }
+	//   }
 
 	if (matches == 0)
 	  {
@@ -807,18 +807,18 @@ static gnu::classpath::jdwp::event::filters::StepFilter *
 get_request_step_filter (EventRequest *request)
 {
   ::java::util::Collection *filters = request->getFilters ();
-  ::java::util::Iterator *iter = filters->iterator ();
+  ::java::util::Iterator *iter;
   filters::StepFilter *filter = NULL;
-  while (iter->hasNext ())
-    {
-      using namespace gnu::classpath::jdwp::event::filters;
-      IEventFilter *next = (IEventFilter *) iter->next ();
-      if (next->getClass () == &StepFilter::class$)
-	{
-	  filter = reinterpret_cast<StepFilter *> (next);
-	  break;
-	}
-    }
+  // while (iter->hasNext ())
+  //   {
+  //     using namespace gnu::classpath::jdwp::event::filters;
+  //     IEventFilter *next = (IEventFilter *) iter->next ();
+  //     if (next->getClass () == &StepFilter::class$)
+// 	{
+// 	  filter = reinterpret_cast<StepFilter *> (next);
+// 	  break;
+// 	}
+  //   }
 
   return filter;
 }
@@ -828,18 +828,18 @@ get_request_location (EventRequest *request)
 {
   Location *loc = NULL;
   ::java::util::Collection *filters = request->getFilters ();
-  ::java::util::Iterator *iter = filters->iterator ();
-  while (iter->hasNext ())
-    {
-      using namespace gnu::classpath::jdwp::event::filters;
-      IEventFilter *filter = (IEventFilter *) iter->next ();
-      if (filter->getClass () == &LocationOnlyFilter::class$)
-	{
-	  LocationOnlyFilter *lof
-	    = reinterpret_cast<LocationOnlyFilter *> (filter);
-	  loc = lof->getLocation ();
-	}
-    }
+  // ::java::util::Iterator *iter;
+  // while (iter->hasNext ())
+  //   {
+  //     using namespace gnu::classpath::jdwp::event::filters;
+  //     IEventFilter *filter = (IEventFilter *) iter->next ();
+  //     if (filter->getClass () == &LocationOnlyFilter::class$)
+// 	{
+// 	  LocationOnlyFilter *lof
+// 	    = reinterpret_cast<LocationOnlyFilter *> (filter);
+// 	  loc = lof->getLocation ();
+// 	}
+  //   }
 
   return loc;
 }
