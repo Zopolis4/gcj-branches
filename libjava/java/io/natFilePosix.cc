@@ -301,14 +301,14 @@ java::io::File::performList (java::io::FilenameFilter *filter,
 	continue;
 
       jstring name = JvNewStringUTF (d->d_name);
-      if (filter && ! filter->accept(this, name))
-	continue;
+      // if (filter && ! filter->accept(this, name))
+// 	continue;
 
       if (result_type == &java::io::File::class$)
         {
 	  java::io::File *file = new java::io::File (this, name);
-	  if (fileFilter && ! fileFilter->accept(file))
-	    continue;
+	  // if (fileFilter && ! fileFilter->accept(file))
+	  //   continue;
 
 	  list->add(file);
 	}
