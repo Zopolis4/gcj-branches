@@ -2338,6 +2338,7 @@ struct GTY(()) lang_type {
   unsigned java_interface : 1;
   unsigned debug_requested : 1;
   unsigned fields_readonly : 1;
+  unsigned ptrmemfunc_flag : 1;
 
   unsigned lazy_default_ctor : 1;
   unsigned lazy_copy_ctor : 1;

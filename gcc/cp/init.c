@@ -3124,30 +3124,11 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
       if (!MAYBE_CLASS_TYPE_P (elt_type))
 	{
-<<<<<<< HEAD
 	  cookie_size = NULL_TREE;
 	  /* No size arithmetic necessary, so the size check is
 	     not needed. */
 	  if (outer_nelts_check != NULL && inner_size == 1)
 	    outer_nelts_check = NULL_TREE;
-	}
-      /* Perform the overflow check.  */
-      tree errval = TYPE_MAX_VALUE (sizetype);
-      if (cxx_dialect >= cxx11 && flag_exceptions)
-	errval = throw_bad_array_new_length ();
-      if (outer_nelts_check != NULL_TREE)
-	size = fold_build3 (COND_EXPR, sizetype, outer_nelts_check,
-			    size, errval);
-      /* Create the argument list.  */
-      vec_safe_insert (*placement, 0, size);
-      /* Do name-lookup to find the appropriate operator.  */
-      fns = lookup_fnfields (elt_type, fnname, /*protect=*/2, complain);
-      if (fns == NULL_TREE)
-	{
-	  if (complain & tf_error)
-	    error ("no suitable %qD found in class %qT", fnname, elt_type);
-	  error ("%qT isn%'t a valid Java class type", elt_type);
-	  return error_mark_node;
 	}
 
       class_decl = build_java_class_ref (elt_type);
@@ -3221,7 +3202,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	  /* Create the argument list.  */
 	  vec_safe_insert (*placement, 0, size);
 	  /* Do name-lookup to find the appropriate operator.  */
-	  fns = lookup_fnfields (elt_type, fnname, /*protect=*/2);
+	  fns = lookup_fnfields (elt_type, fnname, /*protect=*/2, complain);
 	  if (fns == NULL_TREE)
 	    {
               if (complain & tf_error)

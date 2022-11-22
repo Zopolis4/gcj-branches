@@ -3749,24 +3749,23 @@ do_pushdecl (tree decl, bool hiding)
       check_template_shadow (decl);
 
       if (DECL_DECLARES_FUNCTION_P (decl))
-	{
-	  check_default_args (decl);
+	check_default_args (decl);
 
-	  if (hiding)
-	    {
-	      if (level->kind != sk_namespace)
-		{
-		  /* In a local class, a friend function declaration must
-		     find a matching decl in the innermost non-class scope.
-		     [class.friend/11] */
-		  error_at (DECL_SOURCE_LOCATION (decl),
-			    "friend declaration %qD in local class without "
-			    "prior local declaration", decl);
-		  /* Don't attempt to push it.  */
-		  return error_mark_node;
-		}
-	    }
-	}
+	  //if (hiding)
+	    //{
+	  //    if (level->kind != sk_namespace)
+	//	{
+	//	  /* In a local class, a friend function declaration must
+	//	     find a matching decl in the innermost non-class scope.
+	//	     [class.friend/11] */
+	//	  error_at (DECL_SOURCE_LOCATION (decl),
+	//		    "friend declaration %qD in local class without "
+	//		    "prior local declaration", decl);
+	//	  /* Don't attempt to push it.  */
+	//	  return error_mark_node;
+	//	}
+	  //  }
+	//}
 
       if (level->kind != sk_namespace)
 	{
